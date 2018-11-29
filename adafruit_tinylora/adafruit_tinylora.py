@@ -197,11 +197,12 @@ class TinyLoRa:
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
 
-    def send_data(self, data, data_length, frame_counter):
+    def send_data(self, data, data_length, frame_counter, timeout=2):
         """Function to assemble and send data
            :param data: data to send
            :param data_length: length of data to send
-           :param frame_counter: frame counter variable, declared in code.py
+           :param frame_counter: frame counter variable, declared in code.py.
+           :param timeout: TxDone wait time, default is 2.
         """
         # data packet
         enc_data = bytearray(data_length)
@@ -239,12 +240,13 @@ class TinyLoRa:
             lora_pkt[i + lora_pkt_len] = mic[i]
         # recalculate packet length (add MIC length)
         lora_pkt_len += 4
-        self.send_packet(lora_pkt, lora_pkt_len)
+        self.send_packet(lora_pkt, lora_pkt_len, timeout)
 
-    def send_packet(self, lora_packet, packet_length):
+    def send_packet(self, lora_packet, packet_length, timeout):
         """Sends a LoRa packet using the RFM Module
           :param bytearray lora_packet: assembled LoRa packet from send_data
           :param int packet_length: length of LoRa packet to send
+          :param int timeout: TxDone wait time.
         """
         # Set RFM to standby
         self._write_u8(_MODE_STDBY, 0x81)
@@ -279,16 +281,17 @@ class TinyLoRa:
             k += 1
         # switch RFM to TX operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_TX)
-        # wait for TxDone IRQ
         print('Sending packet')
-        send_attempt = 0
-        while not self._irq.value and send_attempt < 15:
-            # waiting for TxDone
-            time.sleep(1)
-            send_attempt += 1
+        # wait for TxDone IRQ, poll for timeout.
+        start = time.monotonic()
+        timed_out = False
+        while not timed_out and not self._irq.value:
+          if(time.monotonic() - start) >= timeout:
+            timed_out = True
         # switch RFM to sleep operating mode
         print('Packet Sent!')
         self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
+
 
     def set_datarate(self, datarate):
         """Sets the RFM Datarate
