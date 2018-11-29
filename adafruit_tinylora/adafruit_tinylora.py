@@ -42,7 +42,7 @@ import time
 from random import randint
 from micropython import const
 import adafruit_bus_device.spi_device as spi_device
-from adafruit_tinylora_encryption import AES
+from adafruit_tinylora.adafruit_tinylora_encryption import AES
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa.git"
@@ -144,16 +144,16 @@ class TinyLoRa:
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
         if 'US' in ttn_config.country:
-            from ttn_usa import TTN_FREQS
+            from adafruit_tinylora.ttn_usa import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif ttn_config.country == 'AS':
-            from ttn_as import TTN_FREQS
+        elif adafruit_tinylora.ttn_config.country == 'AS':
+            from adafruit_tinylora.ttn_as import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif ttn_config.country == 'AU':
-            from ttn_au import TTN_FREQS
+        elif adafruit_tinylora.ttn_config.country == 'AU':
+            from adafruit_tinylora.ttn_au import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif ttn_config.country == 'EU':
-            from ttn_eu import TTN_FREQS
+        elif adafruit_tinylora.ttn_config.country == 'EU':
+            from adafruit_tinylora.ttn_eu import TTN_FREQS
             self._frequencies = TTN_FREQS
         else:
             print("Country Code Incorrect/Unsupported")
@@ -382,6 +382,7 @@ class TinyLoRa:
         with self._device as device:
             # Strip out top bit to set 0 value (read).
             self._BUFFER[0] = address & 0x7F
+            # pylint: disable=no-member
             device.write(self._BUFFER, end=1)
             device.readinto(buf, end=length)
 
@@ -400,4 +401,5 @@ class TinyLoRa:
         with self._device as device:
             self._BUFFER[0] = (address | 0x80)  # MSB 1 to Write
             self._BUFFER[1] = val
+            # pylint: disable=no-member
             device.write(self._BUFFER, end=2)

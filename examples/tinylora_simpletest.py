@@ -2,7 +2,7 @@ import time
 import busio
 import digitalio
 import board
-from adafruit_tinylora import TTN, TinyLoRa
+from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
 
 spi = busio.SPI(board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
