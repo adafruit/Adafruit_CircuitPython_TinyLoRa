@@ -1,5 +1,5 @@
-Adafruit CircuitPython TinyLoRa
-================================
+Introduction
+============
 
 .. image:: https://readthedocs.org/projects/adafruit-circuitpython-tinylora/badge/?version=latest
     :target: https://circuitpython.readthedocs.io/projects/tinylora/en/latest/
@@ -13,7 +13,7 @@ Adafruit CircuitPython TinyLoRa
     :target: https://travis-ci.org/adafruit/Adafruit_CircuitPython_TinyLoRa
     :alt: Build Status
 
-CircuitPython Library for communicating with [The Things Network](https://www.thethingsnetwork.org/) using a Hope RF RFM95/96/97/98(W) LoRa Transceiver Module.
+LoRaWAN/The Things Network, for CircuitPython.
 
 Dependencies
 =============
@@ -26,36 +26,10 @@ Please ensure all dependencies are available on the CircuitPython filesystem.
 This is easily achieved by downloading
 `the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
 
-
-Installing from PyPI
---------------------
-
-On supported GNU/Linux systems like the Raspberry Pi, you can install the driver locally `from
-PyPI <https://pypi.org/project/adafruit-circuitpython-tinylora/>`_. To install for current user:
-
-.. code-block:: shell
-
-    pip3 install adafruit-circuitpython-tinylora
-
-To install system-wide (this may be required in some cases):
-
-.. code-block:: shell
-
-    sudo pip3 install adafruit-circuitpython-tinylora
-
-To install in a virtual environment in your current project:
-
-.. code-block:: shell
-
-    mkdir project-name && cd project-name
-    python3 -m venv .env
-    source .env/bin/activate
-    pip3 install adafruit-circuitpython-tinylora
-
-Usage Notes
+Usage Example
 =============
 
-See the guide for wiring, installation, and detailed usage instructions.
+Usage example is described in the learn guide for this library.
 
 Contributing
 ============

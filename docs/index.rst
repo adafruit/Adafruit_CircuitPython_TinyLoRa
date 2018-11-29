@@ -23,11 +23,10 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+
 .. toctree::
     :caption: Related Products
 
-    Adafruit Feather M0 with RFM95 LoRa Radio <https://www.adafruit.com/product/3178>
-    Adafruit RFM95W LoRa Radio Transceiver Breakout <https://www.adafruit.com/product/3072>
 
 .. toctree::
     :caption: Other Links

@@ -35,8 +35,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Adafruit TinyLoRa Library'
-copyright = u'2018 adafruit'
-author = u'adafruit'
+copyright = u'2018 brentru'
+author = u'brentru'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
