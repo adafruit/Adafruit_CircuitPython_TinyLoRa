@@ -281,11 +281,13 @@ class TinyLoRa:
         self._write_u8(_REG_OPERATING_MODE, _MODE_TX)
         # wait for TxDone IRQ
         print('Sending packet')
-        while not self._irq.value:
+        send_attempt = 0
+        while not self._irq.value and send_attempt < 15:
             # waiting for TxDone
-            print('.', end='')
+            time.sleep(1)
+            send_attempt += 1
         # switch RFM to sleep operating mode
-        print('\nPacket Sent!')
+        print('Packet Sent!')
         self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
 
     def set_datarate(self, datarate):
