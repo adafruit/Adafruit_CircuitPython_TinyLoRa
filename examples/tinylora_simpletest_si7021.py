@@ -59,4 +59,5 @@ while True:
 
     # Send data packet
     lora.send_data(data, len(data), lora.frame_counter)
+    lora.frame_counter += 1
     time.sleep(2)
