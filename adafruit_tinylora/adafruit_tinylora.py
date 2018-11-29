@@ -286,12 +286,13 @@ class TinyLoRa:
         start = time.monotonic()
         timed_out = False
         while not timed_out and not self._irq.value:
-          if(time.monotonic() - start) >= timeout:
-            timed_out = True
-        # switch RFM to sleep operating mode
+            if(time.monotonic() - start) >= timeout:
+                timed_out = True
         print('Packet Sent!')
+        # switch RFM to sleep operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
-
+        if timed_out:
+            raise RuntimeError('Timeout during packet send')
 
     def set_datarate(self, datarate):
         """Sets the RFM Datarate
