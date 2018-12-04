@@ -328,27 +328,21 @@ class AES():
         self._aes_encrypt(key_1, self._network_key)
         # perform gen_key on key_1
         # check if key_1's msb is 1
-        if (key_1[0] & 0x80) == 0x80:
-            msb_key = 1
-        else:
-            msb_key = 0
+        msb_key = (key_1[0] & 0x80) == 0x80
         # shift k1 left 1b
         self._shift_left(key_1)
         # check if msb is 1
-        if msb_key == 1:
-            key_1[15] = key_1[15] ^ 0x87
+        if msb_key:
+            key_1[15] ^= 0x87
         # perform gen_key on key_2
         # copy key_1 to key_2
         for i in range(16):
             key_2[i] = key_1[i]
-        if (key_2[0] & 0x80) == 0x80:
-            msb_key = 1
-        else:
-            msb_key = 0
+        msb_key = (key_2[0] & 0x80) == 0x80
         self._shift_left(key_2)
         # check if msb is 1
-        if msb_key == 1:
-            key_2[15] = key_2[15] ^ 0x87
+        if msb_key:
+            key_2[15] ^= 0x87
 
     @staticmethod
     def _shift_left(data):
@@ -372,4 +366,4 @@ class AES():
         :param bytearray old_data: data to be xor'd.
         """
         for i in range(16):
-            new_data[i] = new_data[i] ^ old_data[i]
+            new_data[i] ^= old_data[i]
