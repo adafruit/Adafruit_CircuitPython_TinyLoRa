@@ -33,7 +33,7 @@ def xtime(col):
     return (((col << 1) ^ 0x1B) & 0xFF) if (col & 0x80) else (col << 1)
 
 # AES S-box
-S_BOX = [b'c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv',
+S_BOX = (b'c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv',
          b'\xca\x82\xc9}\xfaYG\xf0\xad\xd4\xa2\xaf\x9c\xa4r\xc0',
          b'\xb7\xfd\x93&6?\xf7\xcc4\xa5\xe5\xf1q\xd81\x15',
          b"\x04\xc7#\xc3\x18\x96\x05\x9a\x07\x12\x80\xe2\xeb'\xb2u",
@@ -48,7 +48,7 @@ S_BOX = [b'c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv',
          b'\xbax%.\x1c\xa6\xb4\xc6\xe8\xddt\x1fK\xbd\x8b\x8a',
          b'p>\xb5fH\x03\xf6\x0ea5W\xb9\x86\xc1\x1d\x9e',
          b'\xe1\xf8\x98\x11i\xd9\x8e\x94\x9b\x1e\x87\xe9\xceU(\xdf',
-         b'\x8c\xa1\x89\r\xbf\xe6BhA\x99-\x0f\xb0T\xbb\x16']
+         b'\x8c\xa1\x89\r\xbf\xe6BhA\x99-\x0f\xb0T\xbb\x16')
 
 
 class AES():
@@ -133,7 +133,7 @@ class AES():
             for row in range(4):
                 state[col][row] = data[row + (col << 2)]
         # copy key to round_key
-        round_key = bytearray(16)
+        round_key = bytearray(key)
         for i in range(16):
             round_key[i] = key[i]
         self._aes_add_round_key(round_key, state)
@@ -205,7 +205,7 @@ class AES():
         :param byte sub_byte: byte to be replaced with S_BOX byte.
         """
         row = ((sub_byte >> 4) & 0x0F)
-        col = ((sub_byte >> 0) & 0x0F)
+        col = (sub_byte & 0x0F)
         return S_BOX[row][col]
 
     def _aes_sub_bytes(self, state):
@@ -288,7 +288,7 @@ class AES():
             for i in range(16):
                 old_data[i] = new_data[i]
             # increase block_counter
-            block_counter = block_counter + 1
+            block_counter += 1
         # perform calculation on last block
         if incomplete_block_size == 0:
             for i in range(16):

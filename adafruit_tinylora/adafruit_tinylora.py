@@ -215,7 +215,7 @@ class TinyLoRa:
         enc_data = bytearray(data_length)
         lora_pkt = bytearray(64)
         # copy bytearray into bytearray for encryption
-        for i in range(0, data_length):
+        for i in range(data_length):
             enc_data[i] = data[i]
         # encrypt data (enc_data is overwritten in this function)
         self.frame_counter = frame_counter
@@ -235,7 +235,7 @@ class TinyLoRa:
         # set length of LoRa packet
         lora_pkt_len = 9
         # load encrypted data into lora_pkt
-        for i in range(0, data_length):
+        for i in range(data_length):
             lora_pkt[lora_pkt_len + i] = enc_data[i]
         # recalculate packet length
         lora_pkt_len = lora_pkt_len + data_length
@@ -243,7 +243,7 @@ class TinyLoRa:
         mic = bytearray(4)
         mic = aes.calculate_mic(lora_pkt, lora_pkt_len, mic)
         # load mic in package
-        for i in range(0, 4):
+        for i in range(4):
             lora_pkt[i + lora_pkt_len] = mic[i]
         # recalculate packet length (add MIC length)
         lora_pkt_len += 4
@@ -280,11 +280,8 @@ class TinyLoRa:
         # initalize FIFO pointer to base address for TX
         self._write_u8(_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)
         # fill the FIFO buffer with the LoRa payload
-        #k = 0  # ptr
-        i = 0
-        while i < packet_length:
-            self._write_u8(0x00, lora_packet[i])
-            i += 1
+        for k in range(packet_length):
+            self._write_u8(0x00, lora_packet[k])
         # switch RFM to TX operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_TX)
         # wait for TxDone IRQ, poll for timeout.
