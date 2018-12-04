@@ -4,3 +4,9 @@ _build
 .env
 build*
 bundles
+*.mpy
+.idea
+*.DS_Store
+.eggs
+dist
+**/*.egg-info
