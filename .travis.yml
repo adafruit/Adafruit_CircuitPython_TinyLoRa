@@ -1,34 +1,33 @@
-# This is a common .travis.yml for generating library release zip files for
-# CircuitPython library releases using circuitpython-build-tools.
-# See https://github.com/adafruit/circuitpython-build-tools for detailed setup
-# instructions.
-
 dist: trusty
 sudo: false
 language: python
 python:
-    - "3.6"
-
+- '3.6'
 cache:
-    pip: true
-
+  pip: true
 deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
+- provider: releases
+  api_key: "$GITHUB_TOKEN"
   file_glob: true
-  file: $TRAVIS_BUILD_DIR/bundles/*
+  file: "$TRAVIS_BUILD_DIR/bundles/*"
   skip_cleanup: true
   overwrite: true
   on:
     tags: true
-
+- provider: pypi
+  user: adafruit-travis
+  on:
+    tags: true
+  password:
+    secure: a2Qjgzums8nSfwPbwa5peExJgnajfhAZRkTqjFB1M35uTtw25yVfHPJAowiOgy4J2vwe8tzMsGHUKRSSFQN25oa26HD+HhB4TbGuP2TGbUJOzwVme3DH3XUPleanrKLJOkzmNp+p3Eu68IiLNsik2TUMXLWsV+sSOm52emvLLYv63siKZMSZzwhSqgQ0dWz4tWvKG+zcu6fOsFfbs3POAURQh4ULjQVKjtYK14aUv6XxPeB+FA1am6CJa7XQk64KJDWCcQHmKwtNcB/CznEXMSAogVneT2HncXpyJgwirjVUI4WP2X4xjfXCvi8QBq5Ya77YnvzIi/WGLhI8jkh/8HByb5fwVbm68cD1I33fQyHFphU5IA4RLxCEXSO43lXzYRARAXAJ59YcuP//QaUTBjsjt0mzavOcbZtvAHfK1k03NOoPsdjlYMkh+mXtciAysFrSzJ1XosGPTc9p99pGCJSs5ZMFSkJute0NB3ugQY/CAgxUCSEXS0uGc1PQdnFHtqAGMHjvCMIZx05iuHY+A3SZDx3WykX1cw8LKq/lhFYVIut2qaRXmefN8oLbJn7MjHiNbgSvZIDxZ2szv3xfTG/jeMnbgpTZzUNhgiJPnyz+NItPCF1gCnkOduSLKShUyL7D1N5szde41gx0r7oe5HO5vjN4x1qkqKDzvQY2DrM=
 install:
-  - pip install -r requirements.txt
-  - pip install circuitpython-build-tools Sphinx sphinx-rtd-theme
-  - pip install --force-reinstall pylint==1.9.2
-
+- pip install -r requirements.txt
+- pip install circuitpython-build-tools Sphinx sphinx-rtd-theme
+- pip install --force-reinstall pylint==1.9.2
 script:
-  - pylint adafruit_tinylora/*.py
-  - ([[ ! -d "examples" ]] || pylint --disable=missing-docstring,invalid-name,bad-whitespace examples/*.py)
-  - circuitpython-build-bundles --filename_prefix adafruit-circuitpython-tinylora --library_location .
-  - cd docs && sphinx-build -E -W -b html . _build/html
+- pylint adafruit_tinylora/*.py
+- ([[ ! -d "examples" ]] || pylint --disable=missing-docstring,invalid-name,bad-whitespace
+  examples/*.py)
+- circuitpython-build-bundles --filename_prefix adafruit-circuitpython-tinylora --library_location
+  .
+- cd docs && sphinx-build -E -W -b html . _build/html && cd ..
