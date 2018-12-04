@@ -41,7 +41,7 @@ Implementation Notes
 import time
 from random import randint
 from micropython import const
-import adafruit_bus_device.spi_device as spi_device
+import adafruit_bus_device.spi_device
 from adafruit_tinylora.adafruit_tinylora_encryption import AES
 
 __version__ = "0.0.0-auto.0"
@@ -139,8 +139,8 @@ class TinyLoRa:
         """
         self._irq = irq
         # Set up SPI Device on Mode 0
-        self._device = spi_device.SPIDevice(spi, cs, baudrate=4000000,
-                                            polarity=0, phase=0)
+        self._device = adafruit_bus_device.spi_device.SPIDevice(spi, cs, baudrate=4000000,
+                                                                polarity=0, phase=0)
         # Verify the version of the RFM module
         self._version = self._read_u8(_REG_VERSION)
         if self._version != 18:
@@ -156,15 +156,15 @@ class TinyLoRa:
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
         if 'US' in ttn_config.country:
-            from adafruit_tinylora.ttn_usa import TTN_FREQS
+            from ttn_usa import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif adafruit_tinylora.ttn_config.country == 'AS':
+        elif ttn_config.country == 'AS':
             from adafruit_tinylora.ttn_as import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif adafruit_tinylora.ttn_config.country == 'AU':
+        elif ttn_config.country == 'AU':
             from adafruit_tinylora.ttn_au import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif adafruit_tinylora.ttn_config.country == 'EU':
+        elif ttn_config.country == 'EU':
             from adafruit_tinylora.ttn_eu import TTN_FREQS
             self._frequencies = TTN_FREQS
         else:
