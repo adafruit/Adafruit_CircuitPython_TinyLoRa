@@ -123,13 +123,13 @@ class AES():
             self._aes_encrypt(block_a, self._app_key)
             # check for last block
             if i != num_blocks:
-                for j in range(0, 16):
+                for j in range(16):
                     data[k] ^= block_a[j]
                     k += 1
             else:
                 if incomplete_block_size == 0:
                     incomplete_block_size = 16
-                for j in range(0, incomplete_block_size):
+                for j in range(incomplete_block_size):
                     data[k] ^= block_a[j]
                     k += 1
             i += 1
@@ -146,12 +146,12 @@ class AES():
                  ['0', '0', '0', '0'],
                  ['0', '0', '0', '0']]
         # Copy Data to State Array for manipulation
-        for col in range(0, 4):
-            for row in range(0, 4):
+        for col in range(4):
+            for row in range(4):
                 state[col][row] = data[row + (col << 2)]
         # copy key to round_key
         round_key = bytearray(16)
-        for i in range(0, 16):
+        for i in range(16):
             round_key[i] = key[i]
         self._aes_add_round_key(round_key, state)
         # encrypt data 9x
@@ -161,8 +161,8 @@ class AES():
         self._aes_shift_rows(state)
         self._aes_calculate_key(10, round_key)
         self._aes_add_round_key(round_key, state)
-        for row in range(0, 4):
-            for col in range(0, 4):
+        for row in range(4):
+            for col in range(4):
                 data[col + (row << 2)] = state[row][col]
 
     def _round_encrypt(self, state, key, num_round):
@@ -187,10 +187,10 @@ class AES():
         # add round_const calculation
         while num_round != 1:
             b = round_const & 0x80
-            round_const = round_const << 1
+            round_const <<= 1
             round_const &= 0xff
             if b == 0x80:
-                round_const = round_const ^ 0x1b
+                round_const ^= 0x1b
             num_round -= 1
         # Calculate first temp
         tmp_arr[0] = self._aes_sub_byte(round_key[12 + 1])
@@ -200,8 +200,8 @@ class AES():
         # XOR tmp_arr[0] wth round_const first
         tmp_arr[0] ^= round_const
         # then calculate new round key
-        for i in range(0, 4):
-            for j in range(0, 4):
+        for i in range(4):
+            for j in range(4):
                 round_key[j + (i << 2)] ^= tmp_arr[j]
                 tmp_arr[j] = round_key[j + (i << 2)]
 
@@ -211,8 +211,8 @@ class AES():
         :param bytearray round_key: Subkey for each round.
         :param bytearray state: State array.
         """
-        for col in range(0, 4):
-            for row in range(0, 4):
+        for col in range(4):
+            for row in range(4):
                 state[col][row] ^= round_key[row + (col << 2)]
 
     @staticmethod
@@ -287,14 +287,14 @@ class AES():
         # aes encryption on block_b
         self._aes_encrypt(block_b, self._network_key)
         # copy block_b to old_data
-        for i in range(0, 16):
+        for i in range(16):
             old_data[i] = block_b[i]
         block_counter = 1
         # calculate until n-1 packet blocks
         while block_counter < num_blocks:
             # copy data into array
             k = 0  # ptr
-            for i in range(0, 16):
+            for i in range(16):
                 new_data[k] = lora_packet[i]
                 k += 1
             # XOR new_data with old_data
@@ -302,13 +302,13 @@ class AES():
             # aes encrypt new_data
             self._aes_encrypt(new_data, self._network_key)
             # copy new_data to old_data
-            for i in range(0, 16):
+            for i in range(16):
                 old_data[i] = new_data[i]
             # increase block_counter
             block_counter = block_counter + 1
         # perform calculation on last block
         if incomplete_block_size == 0:
-            for i in range(0, 16):
+            for i in range(16):
                 new_data[i] = lora_packet[i]
             # xor with key 1
             self._xor_data(new_data, key_k1)
@@ -319,7 +319,7 @@ class AES():
         else:
             # copy the remaining data
             k = 0  # ptr
-            for i in range(0, 16):
+            for i in range(16):
                 if i < incomplete_block_size:
                     new_data[k] = lora_packet[i]
                     k += 1
@@ -356,7 +356,7 @@ class AES():
             key_1[15] = key_1[15] ^ 0x87
         # perform gen_key on key_2
         # copy key_1 to key_2
-        for i in range(0, 16):
+        for i in range(16):
             key_2[i] = key_1[i]
         if (key_2[0] & 0x80) == 0x80:
             msb_key = 1
@@ -371,7 +371,7 @@ class AES():
     def _shift_left(data):
         """ Shifts data bytearray left by 1
         """
-        for i in range(0, 16):
+        for i in range(16):
             if i < 15:
                 if (data[i + 1] & 0x80) == 0x80:
                     overflow = 1
@@ -388,5 +388,5 @@ class AES():
         :param bytearray new_data: Calculated data.
         :param bytearray old_data: data to be xor'd.
         """
-        for i in range(0, 16):
+        for i in range(16):
             new_data[i] = new_data[i] ^ old_data[i]
