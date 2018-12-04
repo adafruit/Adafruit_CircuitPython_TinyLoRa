@@ -68,6 +68,14 @@ _REG_FIFO_POINTER = const(0x0d)
 _REG_FIFO_BASE_ADDR = const(0x80)
 _REG_OPERATING_MODE = const(0x01)
 _REG_VERSION = const(0x42)
+_REG_PREAMBLE_DETECT = const(0x1F)
+_REG_TIMER1_COEF = const(0x39)
+_REG_NODE_ADDR = const(0x33)
+_REG_IMAGE_CAL = const(0x3B)
+_REG_RSSI_CONFIG = const(0x0E)
+_REG_RSSI_COLLISION = const(0x0F)
+_REG_DIO_MAPPING_1 = const(0x40)
+
 # Freq synth step
 _FSTEP = (32000000.0 / 524288)
 
@@ -133,6 +141,10 @@ class TinyLoRa:
         # Set up SPI Device on Mode 0
         self._device = spi_device.SPIDevice(spi, cs, baudrate=4000000,
                                             polarity=0, phase=0)
+        # Verify the version of the RFM module
+        self._version = self._read_u8(_REG_VERSION)
+        if self._version != 18:
+            raise TypeError("Can not detect LoRa Modle. Please check wiring!")
         # Set Frequency registers
         self._rfm_msb = None
         self._rfm_mid = None
@@ -156,7 +168,7 @@ class TinyLoRa:
             from adafruit_tinylora.ttn_eu import TTN_FREQS
             self._frequencies = TTN_FREQS
         else:
-            print("Country Code Incorrect/Unsupported")
+            raise TypeError("Country Code Incorrect/Unsupported")
         # Set Channel Number
         self._channel = channel
         self._tx_random = randint(0, 7)
@@ -165,35 +177,30 @@ class TinyLoRa:
             self.set_channel(self._channel)
         # Init FrameCounter
         self.frame_counter = 0
-        # Verify the version of the RFM module
-        self._version = self._read_u8(0x42)
-        if self._version != 18:
-            print("Error Detecting RFM95W.")
-            print(" Check your wiring.")
         # Set RFM to Sleep Mode
-        self._write_u8(0x01, _MODE_SLEEP)
+        self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
         # Set RFM to LoRa mode
-        self._write_u8(0x01, _MODE_LORA)
+        self._write_u8(_REG_OPERATING_MODE, _MODE_LORA)
         # Set Max. Power
-        self._write_u8(0x09, 0xFF)
+        self._write_u8(_REG_PA_CONFIG, 0xFF)
         # Set RX Timeout
-        self._write_u8(0x1F, 0x25)
+        self._write_u8(_REG_PREAMBLE_DETECT, 0x25)
         # Preamble Length = 8
         # Setup preamble (0x0008 + 4)
         self._write_u8(_REG_PREAMBLE_MSB, 0x00)
         self._write_u8(_REG_PREAMBLE_LSB, 0x08)
         # Low datarate optimization off AGC auto on
-        self._write_u8(0x26, 0x0C)
+        self._write_u8(_REG_MODEM_CONFIG, 0x0C)
         # Set LoRa sync word
-        self._write_u8(0x39, 0x34)
+        self._write_u8(_REG_TIMER1_COEF, 0x34)
         # Set IQ to normal values
-        self._write_u8(0x33, 0x27)
-        self._write_u8(0x3B, 0x1D)
+        self._write_u8(_REG_NODE_ADDR, 0x27)
+        self._write_u8(_REG_IMAGE_CAL, 0x1D)
         # Set FIFO pointers
         # TX base adress
-        self._write_u8(0x0E, 0x80)
+        self._write_u8(_REG_RSSI_CONFIG, 0x80)
         # Rx base adress
-        self._write_u8(0x0F, 0x00)
+        self._write_u8(_REG_RSSI_COLLISION, 0x00)
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
 
@@ -216,7 +223,7 @@ class TinyLoRa:
                   self._ttn_config.network_key, self.frame_counter)
         enc_data = aes.encrypt(enc_data)
         # append preamble to packet
-        lora_pkt[0] = const(0x40)
+        lora_pkt[0] = const(_REG_DIO_MAPPING_1)
         lora_pkt[1] = self._ttn_config.device_address[3]
         lora_pkt[2] = self._ttn_config.device_address[2]
         lora_pkt[3] = self._ttn_config.device_address[1]
@@ -273,22 +280,19 @@ class TinyLoRa:
         # initalize FIFO pointer to base address for TX
         self._write_u8(_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)
         # fill the FIFO buffer with the LoRa payload
-        k = 0  # ptr
+        #k = 0  # ptr
         i = 0
         while i < packet_length:
-            self._write_u8(0x00, lora_packet[k])
+            self._write_u8(0x00, lora_packet[i])
             i += 1
-            k += 1
         # switch RFM to TX operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_TX)
-        print('Sending packet')
         # wait for TxDone IRQ, poll for timeout.
         start = time.monotonic()
         timed_out = False
         while not timed_out and not self._irq.value:
             if(time.monotonic() - start) >= timeout:
                 timed_out = True
-        print('Packet Sent!')
         # switch RFM to sleep operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
         if timed_out:
@@ -298,76 +302,23 @@ class TinyLoRa:
         """Sets the RFM Datarate
         :param datarate: Bandwidth and Frequency Plan
         """
-        if datarate == 'SF7BW125':
-            self._sf = 0x74
-            self._bw = 0x72
-            self._modemcfg = 0x04
-        elif datarate == 'SF7BW250':
-            self._sf = 0x74
-            self._bw = 0x82
-            self._modemcfg = 0x04
-        elif datarate == 'SF8BW125':
-            self._sf = 0x84
-            self._bw = 0x72
-            self._modemcfg = 0x04
-        elif datarate == 'SF9BW125':
-            self._sf = 0x94
-            self._bw = 0x72
-            self._modemcfg = 0x04
-        elif datarate == 'SF10BW125':
-            self._sf = 0xA4
-            self._bw = 0x72
-            self._modemcfg = 0x04
-        elif datarate == 'SF11BW125':
-            self._sf = 0xB4
-            self._bw = 0x72
-            self._modemcfg = 0x0C
-        elif datarate == 'SF12BW125':
-            self._sf = 0xC4
-            self._bw = 0x72
-            self._modemcfg = 0x0C
-        else:
-            raise TypeError("Invalid Datarate.")
+        data_rates = {'SF7BW125':(0x74, 0x72, 0x04), 'SF7BW250':(0x74, 0x82, 0x04),
+                      'SF8BW125':(0x84, 0x72, 0x04), 'SF9BW125':(0x94, 0x72, 0x04),
+                      'SF10BW125':(0xA4, 0x72, 0x04), 'SF11BW125':(0xB4, 0x72, 0x0C),
+                      'SF12BW125':(0xC4, 0x72, 0x0C)}
+        try:
+            self._sf, self._bw, self._modemcfg = data_rates[datarate]
+        except KeyError:
+            raise KeyError("Invalid or Unsupported Datarate.")
 
     def set_channel(self, channel):
         """Returns the RFM Channel (if single-channel)
         :param int channel: Transmit Channel (0 through 7).
         """
-        if self._channel is not None:
-            if channel == 0:
-                self._rfm_lsb = self._frequencies[0][2]
-                self._rfm_mid = self._frequencies[0][1]
-                self._rfm_msb = self._frequencies[0][0]
-            elif channel == 1:
-                self._rfm_lsb = self._frequencies[1][2]
-                self._rfm_mid = self._frequencies[1][1]
-                self._rfm_msb = self._frequencies[1][0]
-            elif channel == 2:
-                self._rfm_lsb = self._frequencies[2][2]
-                self._rfm_mid = self._frequencies[2][1]
-                self._rfm_msb = self._frequencies[2][0]
-            elif channel == 3:
-                self._rfm_lsb = self._frequencies[3][2]
-                self._rfm_mid = self._frequencies[3][1]
-                self._rfm_msb = self._frequencies[3][0]
-            elif channel == 4:
-                self._rfm_lsb = self._frequencies[4][2]
-                self._rfm_mid = self._frequencies[4][1]
-                self._rfm_msb = self._frequencies[4][0]
-            elif channel == 5:
-                self._rfm_lsb = self._frequencies[5][2]
-                self._rfm_mid = self._frequencies[5][1]
-                self._rfm_msb = self._frequencies[5][0]
-            elif channel == 6:
-                self._rfm_lsb = self._frequencies[6][2]
-                self._rfm_mid = self._frequencies[6][1]
-                self._rfm_msb = self._frequencies[6][0]
-            elif channel == 7:
-                self._rfm_lsb = self._frequencies[7][2]
-                self._rfm_mid = self._frequencies[7][1]
-                self._rfm_msb = self._frequencies[7][0]
-        else:
-            raise AttributeError("Can not set Multi-Channel Channel.")
+        self._rfm_msb, self._rfm_mid, self._rfm_lsb = self._frequencies[channel]
+        print(self._rfm_msb)
+        print(self._rfm_mid)
+        print(self._rfm_lsb)
 
     def _read_into(self, address, buf, length=None):
         """Read a number of bytes from the specified address into the

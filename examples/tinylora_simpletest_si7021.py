@@ -58,6 +58,8 @@ while True:
     data[3] = humid_val & 0xff
 
     # Send data packet
+    print('Sending packet...')
     lora.send_data(data, len(data), lora.frame_counter)
+    print('Packet Sent!')
     lora.frame_counter += 1
     time.sleep(2)

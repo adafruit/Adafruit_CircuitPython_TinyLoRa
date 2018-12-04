@@ -31,6 +31,8 @@ lora = TinyLoRa(spi, cs, irq, ttn_config)
 
 while True:
     data = bytearray(b"\x43\x57\x54\x46")
+    print('Sending packet...')
     lora.send_data(data, len(data), lora.frame_counter)
+    print('Packet sent!')
     lora.frame_counter += 1
     time.sleep(1)
