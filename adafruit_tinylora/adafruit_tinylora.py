@@ -177,6 +177,14 @@ class TinyLoRa:
             self.set_channel(self._channel)
         # Init FrameCounter
         self.frame_counter = 0
+        for pair in ((_REG_OPERATING_MODE, _MODE_SLEEP), (_REG_OPERATING_MODE, _MODE_LORA),
+                (_REG_PA_CONFIG, 0xFF), (_REG_PREAMBLE_DETECT, 0x25),
+                (_REG_PREAMBLE_MSB, 0x00), (_REG_PREAMBLE_LSB, 0x08),
+                (_REG_MODEM_CONFIG, 0x0C), (_REG_TIMER1_COEF, 0x34),
+                (_REG_NODE_ADDR, 0x27), (_REG_IMAGE_CAL, 0x1D),
+                (_REG_RSSI_CONFIG, 0x80), (_REG_RSSI_COLLISION, 0x00)):
+        print(pair[0], pair[1])
+        self._write_u8(pair[0], pair[1])
         # Set RFM to Sleep Mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
         # Set RFM to LoRa mode
