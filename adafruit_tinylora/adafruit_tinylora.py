@@ -179,12 +179,12 @@ class TinyLoRa:
         self.frame_counter = 0
         # Set up RFM9x for LoRa Mode
         for pair in ((_REG_OPERATING_MODE, _MODE_SLEEP), (_REG_OPERATING_MODE, _MODE_LORA),
-                (_REG_PA_CONFIG, 0xFF), (_REG_PREAMBLE_DETECT, 0x25),
-                (_REG_PREAMBLE_MSB, 0x00), (_REG_PREAMBLE_LSB, 0x08),
-                (_REG_MODEM_CONFIG, 0x0C), (_REG_TIMER1_COEF, 0x34),
-                (_REG_NODE_ADDR, 0x27), (_REG_IMAGE_CAL, 0x1D),
-                (_REG_RSSI_CONFIG, 0x80), (_REG_RSSI_COLLISION, 0x00)):
-         self._write_u8(pair[0], pair[1])
+                     (_REG_PA_CONFIG, 0xFF), (_REG_PREAMBLE_DETECT, 0x25),
+                     (_REG_PREAMBLE_MSB, 0x00), (_REG_PREAMBLE_LSB, 0x08),
+                     (_REG_MODEM_CONFIG, 0x0C), (_REG_TIMER1_COEF, 0x34),
+                     (_REG_NODE_ADDR, 0x27), (_REG_IMAGE_CAL, 0x1D),
+                     (_REG_RSSI_CONFIG, 0x80), (_REG_RSSI_COLLISION, 0x00)):
+            self._write_u8(pair[0], pair[1])
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
 
@@ -253,10 +253,11 @@ class TinyLoRa:
             self._rfm_msb = self._frequencies[self._tx_random][0]
         # Set up frequency registers
         for pair in ((_REG_FRF_MSB, self._rfm_msb), (_REG_FRF_MID, self._rfm_mid),
-                (_REG_FRF_LSB, self._rfm_lsb), (_REG_FEI_LSB, self._sf),
-                (_REG_FEI_MSB, self._bw), (_REG_MODEM_CONFIG, self._modemcfg),
-                (_REG_PAYLOAD_LENGTH, packet_length), (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)):
-         self._write_u8(pair[0], pair[1])
+                     (_REG_FRF_LSB, self._rfm_lsb), (_REG_FEI_LSB, self._sf),
+                     (_REG_FEI_MSB, self._bw), (_REG_MODEM_CONFIG, self._modemcfg),
+                     (_REG_PAYLOAD_LENGTH, packet_length),
+                     (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)):
+            self._write_u8(pair[0], pair[1])
         # fill the FIFO buffer with the LoRa payload
         for k in range(packet_length):
             self._write_u8(0x00, lora_packet[k])
