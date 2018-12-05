@@ -7,6 +7,9 @@ import board
 import adafruit_si7021
 from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
 
+# Board LED
+led = digitalio.DigitalInOut(board.D13)
+led.direction = digitalio.Direction.OUTPUT
 
 # Create library object using our bus i2c port for si7021
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -61,5 +64,7 @@ while True:
     print('Sending packet...')
     lora.send_data(data, len(data), lora.frame_counter)
     print('Packet Sent!')
+    led.value = True
     lora.frame_counter += 1
     time.sleep(2)
+    led.value = False

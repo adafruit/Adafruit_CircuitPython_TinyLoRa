@@ -4,6 +4,10 @@ import digitalio
 import board
 from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
 
+# Board LED
+led = digitalio.DigitalInOut(board.D13)
+led.direction = digitalio.Direction.OUTPUT
+
 spi = busio.SPI(board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
 # RFM9x Breakout Pinouts
@@ -34,5 +38,7 @@ while True:
     print('Sending packet...')
     lora.send_data(data, len(data), lora.frame_counter)
     print('Packet sent!')
+    led.value = True
     lora.frame_counter += 1
     time.sleep(1)
+    led.value = False
