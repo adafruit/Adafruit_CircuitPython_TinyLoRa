@@ -218,7 +218,7 @@ class TinyLoRa:
         # set length of LoRa packet
         lora_pkt_len = 9
         # load encrypted data into lora_pkt
-        lora_pkt[lora_pkt_len:data_length] = enc_data[0:data_length]
+        lora_pkt[lora_pkt_len:lora_pkt_len+data_length] = enc_data[0:data_length]
         # recalculate packet length
         lora_pkt_len += data_length
         # Calculate MIC
