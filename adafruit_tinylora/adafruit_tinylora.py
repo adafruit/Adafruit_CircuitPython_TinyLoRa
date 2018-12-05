@@ -156,7 +156,7 @@ class TinyLoRa:
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
         if 'US' in ttn_config.country:
-            from ttn_usa import TTN_FREQS
+            from adafruit_tinylora.ttn_usa import TTN_FREQS
             self._frequencies = TTN_FREQS
         elif ttn_config.country == 'AS':
             from adafruit_tinylora.ttn_as import TTN_FREQS
@@ -177,30 +177,14 @@ class TinyLoRa:
             self.set_channel(self._channel)
         # Init FrameCounter
         self.frame_counter = 0
-        # Set RFM to Sleep Mode
-        self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
-        # Set RFM to LoRa mode
-        self._write_u8(_REG_OPERATING_MODE, _MODE_LORA)
-        # Set Max. Power
-        self._write_u8(_REG_PA_CONFIG, 0xFF)
-        # Set RX Timeout
-        self._write_u8(_REG_PREAMBLE_DETECT, 0x25)
-        # Preamble Length = 8
-        # Setup preamble (0x0008 + 4)
-        self._write_u8(_REG_PREAMBLE_MSB, 0x00)
-        self._write_u8(_REG_PREAMBLE_LSB, 0x08)
-        # Low datarate optimization off AGC auto on
-        self._write_u8(_REG_MODEM_CONFIG, 0x0C)
-        # Set LoRa sync word
-        self._write_u8(_REG_TIMER1_COEF, 0x34)
-        # Set IQ to normal values
-        self._write_u8(_REG_NODE_ADDR, 0x27)
-        self._write_u8(_REG_IMAGE_CAL, 0x1D)
-        # Set FIFO pointers
-        # TX base adress
-        self._write_u8(_REG_RSSI_CONFIG, 0x80)
-        # Rx base adress
-        self._write_u8(_REG_RSSI_COLLISION, 0x00)
+        # Set up RFM9x for LoRa Mode
+        for pair in ((_REG_OPERATING_MODE, _MODE_SLEEP), (_REG_OPERATING_MODE, _MODE_LORA),
+                     (_REG_PA_CONFIG, 0xFF), (_REG_PREAMBLE_DETECT, 0x25),
+                     (_REG_PREAMBLE_MSB, 0x00), (_REG_PREAMBLE_LSB, 0x08),
+                     (_REG_MODEM_CONFIG, 0x0C), (_REG_TIMER1_COEF, 0x34),
+                     (_REG_NODE_ADDR, 0x27), (_REG_IMAGE_CAL, 0x1D),
+                     (_REG_RSSI_CONFIG, 0x80), (_REG_RSSI_COLLISION, 0x00)):
+            self._write_u8(pair[0], pair[1])
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
 
@@ -215,8 +199,7 @@ class TinyLoRa:
         enc_data = bytearray(data_length)
         lora_pkt = bytearray(64)
         # copy bytearray into bytearray for encryption
-        for i in range(0, data_length):
-            enc_data[i] = data[i]
+        enc_data[0:data_length] = data[0:data_length]
         # encrypt data (enc_data is overwritten in this function)
         self.frame_counter = frame_counter
         aes = AES(self._ttn_config.device_address, self._ttn_config.app_key,
@@ -235,16 +218,14 @@ class TinyLoRa:
         # set length of LoRa packet
         lora_pkt_len = 9
         # load encrypted data into lora_pkt
-        for i in range(0, data_length):
-            lora_pkt[lora_pkt_len + i] = enc_data[i]
+        lora_pkt[lora_pkt_len:lora_pkt_len+data_length] = enc_data[0:data_length]
         # recalculate packet length
-        lora_pkt_len = lora_pkt_len + data_length
+        lora_pkt_len += data_length
         # Calculate MIC
         mic = bytearray(4)
         mic = aes.calculate_mic(lora_pkt, lora_pkt_len, mic)
         # load mic in package
-        for i in range(0, 4):
-            lora_pkt[i + lora_pkt_len] = mic[i]
+        lora_pkt[lora_pkt_len:lora_pkt_len+4] = mic[0:4]
         # recalculate packet length (add MIC length)
         lora_pkt_len += 4
         self.send_packet(lora_pkt, lora_pkt_len, timeout)
@@ -267,24 +248,16 @@ class TinyLoRa:
             self._rfm_lsb = self._frequencies[self._tx_random][2]
             self._rfm_mid = self._frequencies[self._tx_random][1]
             self._rfm_msb = self._frequencies[self._tx_random][0]
-        # write to RFM channel registers...
-        self._write_u8(_REG_FRF_MSB, self._rfm_msb)
-        self._write_u8(_REG_FRF_MID, self._rfm_mid)
-        self._write_u8(_REG_FRF_LSB, self._rfm_lsb)
-        # set RFM datarate
-        self._write_u8(_REG_FEI_LSB, self._sf)
-        self._write_u8(_REG_FEI_MSB, self._bw)
-        self._write_u8(_REG_MODEM_CONFIG, self._modemcfg)
-        # set RegPayloadLength
-        self._write_u8(_REG_PAYLOAD_LENGTH, packet_length)
-        # initalize FIFO pointer to base address for TX
-        self._write_u8(_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)
+        # Set up frequency registers
+        for pair in ((_REG_FRF_MSB, self._rfm_msb), (_REG_FRF_MID, self._rfm_mid),
+                     (_REG_FRF_LSB, self._rfm_lsb), (_REG_FEI_LSB, self._sf),
+                     (_REG_FEI_MSB, self._bw), (_REG_MODEM_CONFIG, self._modemcfg),
+                     (_REG_PAYLOAD_LENGTH, packet_length),
+                     (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)):
+            self._write_u8(pair[0], pair[1])
         # fill the FIFO buffer with the LoRa payload
-        #k = 0  # ptr
-        i = 0
-        while i < packet_length:
-            self._write_u8(0x00, lora_packet[i])
-            i += 1
+        for k in range(packet_length):
+            self._write_u8(0x00, lora_packet[k])
         # switch RFM to TX operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_TX)
         # wait for TxDone IRQ, poll for timeout.
