@@ -134,8 +134,6 @@ class AES():
                 state[col][row] = data[row + (col << 2)]
         # copy key to round_key
         round_key = bytearray(key)
-        for i in range(16):
-            round_key[i] = key[i]
         self._aes_add_round_key(round_key, state)
         # encrypt data 9x
         for round_nums in range(1, 10):
@@ -336,8 +334,7 @@ class AES():
             key_1[15] ^= 0x87
         # perform gen_key on key_2
         # copy key_1 to key_2
-        for i in range(16):
-            key_2[i] = key_1[i]
+        key_2[0:16] = key_1[0:16]
         msb_key = (key_2[0] & 0x80) == 0x80
         self._shift_left(key_2)
         # check if msb is 1

@@ -199,8 +199,7 @@ class TinyLoRa:
         enc_data = bytearray(data_length)
         lora_pkt = bytearray(64)
         # copy bytearray into bytearray for encryption
-        for i in range(data_length):
-            enc_data[i] = data[i]
+        enc_data[0:data_length] = data[0:4]
         # encrypt data (enc_data is overwritten in this function)
         self.frame_counter = frame_counter
         aes = AES(self._ttn_config.device_address, self._ttn_config.app_key,
@@ -219,16 +218,14 @@ class TinyLoRa:
         # set length of LoRa packet
         lora_pkt_len = 9
         # load encrypted data into lora_pkt
-        for i in range(data_length):
-            lora_pkt[lora_pkt_len + i] = enc_data[i]
+        lora_pkt[lora_pkt_len:data_length] = enc_data[0:4]
         # recalculate packet length
         lora_pkt_len = lora_pkt_len + data_length
         # Calculate MIC
         mic = bytearray(4)
         mic = aes.calculate_mic(lora_pkt, lora_pkt_len, mic)
         # load mic in package
-        for i in range(4):
-            lora_pkt[i + lora_pkt_len] = mic[i]
+        lora_pkt[lora_pkt_len:lora_pkt_len+4] = mic[0:4]
         # recalculate packet length (add MIC length)
         lora_pkt_len += 4
         self.send_packet(lora_pkt, lora_pkt_len, timeout)
