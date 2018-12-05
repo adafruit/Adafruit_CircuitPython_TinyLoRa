@@ -26,6 +26,31 @@ Please ensure all dependencies are available on the CircuitPython filesystem.
 This is easily achieved by downloading
 `the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
 
+Installing from PyPI
+--------------------
+
+On supported GNU/Linux systems like the Raspberry Pi, you can install the driver locally `from
+PyPI <https://pypi.org/project/adafruit-circuitpython-tinylora/>`_. To install for current user:
+
+.. code-block:: shell
+
+    pip3 install adafruit-circuitpython-tinylora
+
+To install system-wide (this may be required in some cases):
+
+.. code-block:: shell
+
+    sudo pip3 install adafruit-circuitpython-tinylora
+
+To install in a virtual environment in your current project:
+
+.. code-block:: shell
+
+    mkdir project-name && cd project-name
+    python3 -m venv .env
+    source .env/bin/activate
+    pip3 install adafruit-circuitpython-tinylora
+
 Usage Example
 =============
 
@@ -87,3 +112,11 @@ Now, once you have the virtual environment activated:
 This will output the documentation to ``docs/_build/html``. Open the index.html in your browser to
 view them. It will also (due to -W) error out on any warning like Travis will. This is a good way to
 locally verify it will pass.
+
+License
+=======
+This library was written by ClemensRiederer. We've converted it to work with Adafruit CircuitPython and made
+changes so it works with the Raspberry Pi and Adafruit Feather M0/M4. We've added examples for using this library
+to transmit data and sensor data to The Things Network.
+
+This open source code is licensed under the LGPL license (see LICENSE for details).
