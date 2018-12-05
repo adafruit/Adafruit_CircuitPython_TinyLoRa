@@ -1,8 +1,8 @@
 Introduction
 ============
 
-.. image:: https://readthedocs.org/projects/adafruit-circuitpython-tinylora/badge/?version=latest
-    :target: https://circuitpython.readthedocs.io/projects/tinylora/en/latest/
+.. image:: https://readthedocs.org/projects/circuitpython-tinylora/badge/?version=latest
+    :target: https://circuitpython-tinylora.readthedocs.io/en/latest/
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/discord/327254708534116352.svg
@@ -54,7 +54,9 @@ To install in a virtual environment in your current project:
 Usage Example
 =============
 
-Usage example is described in the learn guide for this library.
+Usage is described in the `learn guide for this library<https://learn.adafruit.com/using-lorawan-and-the-things-network-with-circuitpython>`_.
+
+
 
 Contributing
 ============
