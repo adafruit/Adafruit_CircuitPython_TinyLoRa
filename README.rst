@@ -23,8 +23,7 @@ This driver depends on:
 * `Bus Device <https://github.com/adafruit/Adafruit_CircuitPython_BusDevice>`_
 
 Please ensure all dependencies are available on the CircuitPython filesystem.
-This is easily achieved by downloading
-`the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
+This is easily achieved by downloading `the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
 
 Installing from PyPI
 --------------------
@@ -54,7 +53,9 @@ To install in a virtual environment in your current project:
 Usage Example
 =============
 
-Usage example is described in the learn guide for this library.
+Usage is described in the `learn guide for this library <https://learn.adafruit.com/using-lorawan-and-the-things-network-with-circuitpython>`_.
+
+
 
 Contributing
 ============
