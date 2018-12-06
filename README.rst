@@ -1,8 +1,8 @@
 Introduction
 ============
 
-.. image:: https://readthedocs.org/projects/circuitpython-tinylora/badge/?version=latest
-    :target: https://circuitpython-tinylora.readthedocs.io/en/latest/
+.. image:: https://readthedocs.org/projects/adafruit-circuitpython-tinylora/badge/?version=latest
+    :target: https://circuitpython.readthedocs.io/projects/tinylora/en/latest/
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/discord/327254708534116352.svg
@@ -23,8 +23,7 @@ This driver depends on:
 * `Bus Device <https://github.com/adafruit/Adafruit_CircuitPython_BusDevice>`_
 
 Please ensure all dependencies are available on the CircuitPython filesystem.
-This is easily achieved by downloading
-`the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
+This is easily achieved by downloading `the Adafruit library and driver bundle <https://github.com/adafruit/Adafruit_CircuitPython_Bundle>`_.
 
 Installing from PyPI
 --------------------
@@ -54,7 +53,7 @@ To install in a virtual environment in your current project:
 Usage Example
 =============
 
-Usage is described in the `learn guide for this library<https://learn.adafruit.com/using-lorawan-and-the-things-network-with-circuitpython>`_.
+Usage is described in the `learn guide for this library <https://learn.adafruit.com/using-lorawan-and-the-things-network-with-circuitpython>`_.
 
 
 
