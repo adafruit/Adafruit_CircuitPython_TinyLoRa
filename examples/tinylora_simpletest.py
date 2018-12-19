@@ -8,7 +8,7 @@ from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
 led = digitalio.DigitalInOut(board.D13)
 led.direction = digitalio.Direction.OUTPUT
 
-spi = busio.SPI(board.SCK, board.MISO, board.MOSI)
+spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
 # RFM9x Breakout Pinouts
 cs = digitalio.DigitalInOut(board.D5)

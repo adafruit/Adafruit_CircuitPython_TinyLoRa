@@ -16,7 +16,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_si7021.SI7021(i2c)
 
 # Create library object using our bus SPI port for radio
-spi = busio.SPI(board.SCK, board.MISO, board.MOSI)
+spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
 # RFM9x Breakout Pinouts
 cs = digitalio.DigitalInOut(board.D5)
