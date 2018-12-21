@@ -138,8 +138,11 @@ class TinyLoRa:
         :param int channel: Frequency Channel.
         """
         self._irq = irq
+        self._irq.switch_to_input()
+        self._cs = cs
+        self._cs.switch_to_output()
         # Set up SPI Device on Mode 0
-        self._device = adafruit_bus_device.spi_device.SPIDevice(spi, cs, baudrate=4000000,
+        self._device = adafruit_bus_device.spi_device.SPIDevice(spi, self._cs, baudrate=4000000,
                                                                 polarity=0, phase=0)
         # Verify the version of the RFM module
         self._version = self._read_u8(_REG_VERSION)

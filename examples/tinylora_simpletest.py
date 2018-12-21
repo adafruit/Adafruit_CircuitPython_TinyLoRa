@@ -12,17 +12,11 @@ spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
 # RFM9x Breakout Pinouts
 cs = digitalio.DigitalInOut(board.D5)
-cs.direction = digitalio.Direction.INPUT
 irq = digitalio.DigitalInOut(board.D6)
-irq.direction = digitalio.Direction.INPUT
 
 # Feather M0 RFM9x Pinouts
-# irq = digitalio.DigitalInOut(board.RFM9X_D0)
 # cs = digitalio.DigitalInOut(board.RFM9X_CS)
-# cs = digitalio.DigitalInOut(board.RFM9X_CS)
-# cs.direction = digitalio.Direction.INPUT
 # irq = digitalio.DigitalInOut(board.RFM9X_D0)
-# irq.direction = digitalio.Direction.INPUT
 
 # TTN Device Address, 4 Bytes, MSB
 devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
