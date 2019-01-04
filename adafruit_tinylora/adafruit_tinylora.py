@@ -147,7 +147,7 @@ class TinyLoRa:
         # Verify the version of the RFM module
         self._version = self._read_u8(_REG_VERSION)
         if self._version != 18:
-            raise TypeError("Can not detect LoRa Modle. Please check wiring!")
+            raise TypeError("Can not detect LoRa Module. Please check wiring!")
         # Set Frequency registers
         self._rfm_msb = None
         self._rfm_mid = None
