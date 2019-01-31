@@ -288,13 +288,10 @@ class TinyLoRa:
             raise KeyError("Invalid or Unsupported Datarate.")
 
     def set_channel(self, channel):
-        """Returns the RFM Channel (if single-channel)
+        """Sets the RFM Channel (if single-channel)
         :param int channel: Transmit Channel (0 through 7).
         """
         self._rfm_msb, self._rfm_mid, self._rfm_lsb = self._frequencies[channel]
-        print(self._rfm_msb)
-        print(self._rfm_mid)
-        print(self._rfm_lsb)
 
     def _read_into(self, address, buf, length=None):
         """Read a number of bytes from the specified address into the
