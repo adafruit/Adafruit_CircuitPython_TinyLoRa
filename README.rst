@@ -1,7 +1,7 @@
 Introduction
 ============
 
-.. image:: https://readthedocs.org/projects/adafruit-circuitpython-tinylora/badge/?version=latest
+.. image:: https://readthedocs.org/projects/circuitpython-tinylora/badge/?version=latest
     :target: https://circuitpython.readthedocs.io/projects/tinylora/en/latest/
     :alt: Documentation Status
 
