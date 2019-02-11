@@ -83,7 +83,7 @@ class AES():
         # k = data ptr
         k = 0
         i = 1
-        while i <= 1:
+        while i <= num_blocks:
             block_a[0] = 0x01
             block_a[1] = 0x00
             block_a[2] = 0x00
@@ -272,11 +272,11 @@ class AES():
             old_data[i] = block_b[i]
         block_counter = 1
         # calculate until n-1 packet blocks
+        k = 0  # ptr
         while block_counter < num_blocks:
             # copy data into array
-            k = 0  # ptr
             for i in range(16):
-                new_data[k] = lora_packet[i]
+                new_data[i] = lora_packet[k]
                 k += 1
             # XOR new_data with old_data
             self._xor_data(new_data, old_data)
@@ -290,7 +290,8 @@ class AES():
         # perform calculation on last block
         if incomplete_block_size == 0:
             for i in range(16):
-                new_data[i] = lora_packet[i]
+                new_data[i] = lora_packet[k]
+                k += 1
             # xor with key 1
             self._xor_data(new_data, key_k1)
             # xor with old data
@@ -299,10 +300,9 @@ class AES():
             self._aes_encrypt(new_data, self._network_key)
         else:
             # copy the remaining data
-            k = 0  # ptr
             for i in range(16):
                 if i < incomplete_block_size:
-                    new_data[k] = lora_packet[i]
+                    new_data[i] = lora_packet[k]
                     k += 1
                 if i == incomplete_block_size:
                     new_data[i] = 0x80
