@@ -64,7 +64,7 @@ _REG_FEI_LSB = const(0x1E)
 _REG_FEI_MSB = const(0x1D)
 _REG_MODEM_CONFIG = const(0x26)
 _REG_PAYLOAD_LENGTH = const(0x22)
-_REG_FIFO_POINTER = const(0x0d)
+_REG_FIFO_POINTER = const(0x0D)
 _REG_FIFO_BASE_ADDR = const(0x80)
 _REG_OPERATING_MODE = const(0x01)
 _REG_VERSION = const(0x42)
@@ -77,12 +77,14 @@ _REG_RSSI_COLLISION = const(0x0F)
 _REG_DIO_MAPPING_1 = const(0x40)
 
 # Freq synth step
-_FSTEP = (32000000.0 / 524288)
+_FSTEP = 32000000.0 / 524288
+
 
 class TTN:
     """TTN Class
     """
-    def __init__(self, dev_address, net_key, app_key, country='US'):
+
+    def __init__(self, dev_address, net_key, app_key, country="US"):
         """Interface for TheThingsNetwork
         :param bytearray dev_address: TTN Device Address.
         :param bytearray net_key: TTN Network Key.
@@ -123,17 +125,19 @@ class TTN:
 class TinyLoRa:
     """TinyLoRa Interface
     """
+
     # SPI Write Buffer
     _BUFFER = bytearray(2)
 
     # pylint: disable=too-many-arguments
-    def __init__(self, spi, cs, irq, ttn_config, channel=None):
+    def __init__(self, spi, cs, irq, rst, ttn_config, channel=None):
         """Interface for a HopeRF RFM95/6/7/8(w) radio module. Sets module up for sending to
         The Things Network.
 
         :param ~busio.SPI spi: The SPI bus the device is on
         :param ~digitalio.DigitalInOut cs: Chip select pin (RFM_NSS)
         :param ~digitalio.DigitalInOut irq: RFM's DIO0 Pin (RFM_DIO0)
+        :param ~digitalio.DigitalInOut rst: RFM's RST Pin (RFM_RST)
         :param TTN ttn_config: TTN Configuration.
         :param int channel: Frequency Channel.
         """
@@ -141,9 +145,16 @@ class TinyLoRa:
         self._irq.switch_to_input()
         self._cs = cs
         self._cs.switch_to_output()
+        self._rst = rst
+        self._rst.switch_to_output()
         # Set up SPI Device on Mode 0
-        self._device = adafruit_bus_device.spi_device.SPIDevice(spi, self._cs, baudrate=4000000,
-                                                                polarity=0, phase=0)
+        self._device = adafruit_bus_device.spi_device.SPIDevice(
+            spi, self._cs, baudrate=4000000, polarity=0, phase=0
+        )
+        self._rst.value = False
+        time.sleep(0.0001)  # 100 us
+        self._rst.value = True
+        time.sleep(0.005)  # 5 ms
         # Verify the version of the RFM module
         self._version = self._read_u8(_REG_VERSION)
         if self._version != 18:
@@ -158,16 +169,16 @@ class TinyLoRa:
         self._modemcfg = None
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
-        if 'US' in ttn_config.country:
+        if "US" in ttn_config.country:
             from adafruit_tinylora.ttn_usa import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif ttn_config.country == 'AS':
+        elif ttn_config.country == "AS":
             from adafruit_tinylora.ttn_as import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif ttn_config.country == 'AU':
+        elif ttn_config.country == "AU":
             from adafruit_tinylora.ttn_au import TTN_FREQS
             self._frequencies = TTN_FREQS
-        elif ttn_config.country == 'EU':
+        elif ttn_config.country == "EU":
             from adafruit_tinylora.ttn_eu import TTN_FREQS
             self._frequencies = TTN_FREQS
         else:
@@ -181,15 +192,43 @@ class TinyLoRa:
         # Init FrameCounter
         self.frame_counter = 0
         # Set up RFM9x for LoRa Mode
-        for pair in ((_REG_OPERATING_MODE, _MODE_SLEEP), (_REG_OPERATING_MODE, _MODE_LORA),
-                     (_REG_PA_CONFIG, 0xFF), (_REG_PREAMBLE_DETECT, 0x25),
-                     (_REG_PREAMBLE_MSB, 0x00), (_REG_PREAMBLE_LSB, 0x08),
-                     (_REG_MODEM_CONFIG, 0x0C), (_REG_TIMER1_COEF, 0x34),
-                     (_REG_NODE_ADDR, 0x27), (_REG_IMAGE_CAL, 0x1D),
-                     (_REG_RSSI_CONFIG, 0x80), (_REG_RSSI_COLLISION, 0x00)):
+        for pair in (
+                (_REG_OPERATING_MODE, _MODE_SLEEP),
+                (_REG_OPERATING_MODE, _MODE_LORA),
+                (_REG_PA_CONFIG, 0xFF),
+                (_REG_PREAMBLE_DETECT, 0x25),
+                (_REG_PREAMBLE_MSB, 0x00),
+                (_REG_PREAMBLE_LSB, 0x08),
+                (_REG_MODEM_CONFIG, 0x0C),
+                (_REG_TIMER1_COEF, 0x34),
+                (_REG_NODE_ADDR, 0x27),
+                (_REG_IMAGE_CAL, 0x1D),
+                (_REG_RSSI_CONFIG, 0x80),
+                (_REG_RSSI_COLLISION, 0x00),
+        ):
             self._write_u8(pair[0], pair[1])
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
+
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        self.deinit()
+
+    def deinit(self):
+        """Deinitializes the TinyLoRa object properties and pins."""
+        self._irq = None
+        self._rst = None
+        self._cs = None
+        self.frame_counter = 0
+        self._rfm_msb = None
+        self._rfm_mid = None
+        self._rfm_lsb = None
+        self._sf = None
+        self._bw = None
+        self._modemcfg = None
 
     def send_data(self, data, data_length, frame_counter, timeout=2):
         """Function to assemble and send data
@@ -205,8 +244,12 @@ class TinyLoRa:
         enc_data[0:data_length] = data[0:data_length]
         # encrypt data (enc_data is overwritten in this function)
         self.frame_counter = frame_counter
-        aes = AES(self._ttn_config.device_address, self._ttn_config.app_key,
-                  self._ttn_config.network_key, self.frame_counter)
+        aes = AES(
+            self._ttn_config.device_address,
+            self._ttn_config.app_key,
+            self._ttn_config.network_key,
+            self.frame_counter,
+        )
         enc_data = aes.encrypt(enc_data)
         # append preamble to packet
         lora_pkt[0] = const(_REG_DIO_MAPPING_1)
@@ -221,14 +264,14 @@ class TinyLoRa:
         # set length of LoRa packet
         lora_pkt_len = 9
         # load encrypted data into lora_pkt
-        lora_pkt[lora_pkt_len:lora_pkt_len+data_length] = enc_data[0:data_length]
+        lora_pkt[lora_pkt_len : lora_pkt_len + data_length] = enc_data[0:data_length]
         # recalculate packet length
         lora_pkt_len += data_length
         # Calculate MIC
         mic = bytearray(4)
         mic = aes.calculate_mic(lora_pkt, lora_pkt_len, mic)
         # load mic in package
-        lora_pkt[lora_pkt_len:lora_pkt_len+4] = mic[0:4]
+        lora_pkt[lora_pkt_len : lora_pkt_len + 4] = mic[0:4]
         # recalculate packet length (add MIC length)
         lora_pkt_len += 4
         self.send_packet(lora_pkt, lora_pkt_len, timeout)
@@ -252,11 +295,16 @@ class TinyLoRa:
             self._rfm_mid = self._frequencies[self._tx_random][1]
             self._rfm_msb = self._frequencies[self._tx_random][0]
         # Set up frequency registers
-        for pair in ((_REG_FRF_MSB, self._rfm_msb), (_REG_FRF_MID, self._rfm_mid),
-                     (_REG_FRF_LSB, self._rfm_lsb), (_REG_FEI_LSB, self._sf),
-                     (_REG_FEI_MSB, self._bw), (_REG_MODEM_CONFIG, self._modemcfg),
-                     (_REG_PAYLOAD_LENGTH, packet_length),
-                     (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR)):
+        for pair in (
+                (_REG_FRF_MSB, self._rfm_msb),
+                (_REG_FRF_MID, self._rfm_mid),
+                (_REG_FRF_LSB, self._rfm_lsb),
+                (_REG_FEI_LSB, self._sf),
+                (_REG_FEI_MSB, self._bw),
+                (_REG_MODEM_CONFIG, self._modemcfg),
+                (_REG_PAYLOAD_LENGTH, packet_length),
+                (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR),
+        ):
             self._write_u8(pair[0], pair[1])
         # fill the FIFO buffer with the LoRa payload
         for k in range(packet_length):
@@ -267,21 +315,26 @@ class TinyLoRa:
         start = time.monotonic()
         timed_out = False
         while not timed_out and not self._irq.value:
-            if(time.monotonic() - start) >= timeout:
+            if (time.monotonic() - start) >= timeout:
                 timed_out = True
         # switch RFM to sleep operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_SLEEP)
         if timed_out:
-            raise RuntimeError('Timeout during packet send')
+            raise RuntimeError("Timeout during packet send")
 
     def set_datarate(self, datarate):
         """Sets the RFM Datarate
         :param datarate: Bandwidth and Frequency Plan
         """
-        data_rates = {'SF7BW125':(0x74, 0x72, 0x04), 'SF7BW250':(0x74, 0x82, 0x04),
-                      'SF8BW125':(0x84, 0x72, 0x04), 'SF9BW125':(0x94, 0x72, 0x04),
-                      'SF10BW125':(0xA4, 0x72, 0x04), 'SF11BW125':(0xB4, 0x72, 0x0C),
-                      'SF12BW125':(0xC4, 0x72, 0x0C)}
+        data_rates = {
+            "SF7BW125": (0x74, 0x72, 0x04),
+            "SF7BW250": (0x74, 0x82, 0x04),
+            "SF8BW125": (0x84, 0x72, 0x04),
+            "SF9BW125": (0x94, 0x72, 0x04),
+            "SF10BW125": (0xA4, 0x72, 0x04),
+            "SF11BW125": (0xB4, 0x72, 0x0C),
+            "SF12BW125": (0xC4, 0x72, 0x0C),
+        }
         try:
             self._sf, self._bw, self._modemcfg = data_rates[datarate]
         except KeyError:
@@ -323,7 +376,7 @@ class TinyLoRa:
         :param val: Data to write.
         """
         with self._device as device:
-            self._BUFFER[0] = (address | 0x80)  # MSB 1 to Write
+            self._BUFFER[0] = address | 0x80  # MSB 1 to Write
             self._BUFFER[1] = val
             # pylint: disable=no-member
             device.write(self._BUFFER, end=2)
