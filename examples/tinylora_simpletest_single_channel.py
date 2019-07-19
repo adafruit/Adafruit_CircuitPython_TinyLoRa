@@ -13,10 +13,12 @@ spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 # RFM9x Breakout Pinouts
 cs = digitalio.DigitalInOut(board.D5)
 irq = digitalio.DigitalInOut(board.D6)
+rst = digitalio.DigitalInOut(board.D4)
 
 # Feather M0 RFM9x Pinouts
 # cs = digitalio.DigitalInOut(board.RFM9X_CS)
 # irq = digitalio.DigitalInOut(board.RFM9X_D0)
+# rst = digitalio.DigitalInOut(board.RFM9x_RST)
 
 # TTN Device Address, 4 Bytes, MSB
 devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
@@ -32,7 +34,7 @@ app = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 ttn_config = TTN(devaddr, nwkey, app, country='US')
 
 # Broadcasting on channel 0 in US Region - 903.9 MHz
-lora = TinyLoRa(spi, cs, irq, ttn_config, channel=0)
+lora = TinyLoRa(spi, cs, irq, rst, ttn_config, channel=0)
 
 while True:
     data = bytearray(b"\x43\x57\x54\x46")
