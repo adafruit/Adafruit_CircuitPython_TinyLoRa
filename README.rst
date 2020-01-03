@@ -9,8 +9,8 @@ Introduction
     :target: https://discord.gg/nBQh6qu
     :alt: Discord
 
-.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_TinyLoRa.svg?branch=master
-    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_TinyLoRa
+.. image:: https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa/workflows/Build%20CI/badge.svg
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa/actions/
     :alt: Build Status
 
 LoRaWAN/The Things Network, for CircuitPython.
