@@ -26,7 +26,7 @@ rst = digitalio.DigitalInOut(board.D4)
 # Feather M0 RFM9x Pinouts
 # cs = digitalio.DigitalInOut(board.RFM9X_CS)
 # irq = digitalio.DigitalInOut(board.RFM9X_D0)
-# rst = digitalio.DigitalInOut(board.RFM9x_RST)
+# rst = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
 devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
