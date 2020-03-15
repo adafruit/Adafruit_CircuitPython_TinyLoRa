@@ -32,26 +32,29 @@ def xtime(col):
     """
     return (((col << 1) ^ 0x1B) & 0xFF) if (col & 0x80) else (col << 1)
 
+
 # AES S-box
-S_BOX = (b'c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv',
-         b'\xca\x82\xc9}\xfaYG\xf0\xad\xd4\xa2\xaf\x9c\xa4r\xc0',
-         b'\xb7\xfd\x93&6?\xf7\xcc4\xa5\xe5\xf1q\xd81\x15',
-         b"\x04\xc7#\xc3\x18\x96\x05\x9a\x07\x12\x80\xe2\xeb'\xb2u",
-         b'\t\x83,\x1a\x1bnZ\xa0R;\xd6\xb3)\xe3/\x84',
-         b'S\xd1\x00\xed \xfc\xb1[j\xcb\xbe9JLX\xcf',
-         b'\xd0\xef\xaa\xfbCM3\x85E\xf9\x02\x7fP<\x9f\xa8',
-         b'Q\xa3@\x8f\x92\x9d8\xf5\xbc\xb6\xda!\x10\xff\xf3\xd2',
-         b'\xcd\x0c\x13\xec_\x97D\x17\xc4\xa7~=d]\x19s',
-         b'`\x81O\xdc"*\x90\x88F\xee\xb8\x14\xde^\x0b\xdb',
-         b'\xe02:\nI\x06$\\\xc2\xd3\xacb\x91\x95\xe4y',
-         b'\xe7\xc87m\x8d\xd5N\xa9lV\xf4\xeaez\xae\x08',
-         b'\xbax%.\x1c\xa6\xb4\xc6\xe8\xddt\x1fK\xbd\x8b\x8a',
-         b'p>\xb5fH\x03\xf6\x0ea5W\xb9\x86\xc1\x1d\x9e',
-         b'\xe1\xf8\x98\x11i\xd9\x8e\x94\x9b\x1e\x87\xe9\xceU(\xdf',
-         b'\x8c\xa1\x89\r\xbf\xe6BhA\x99-\x0f\xb0T\xbb\x16')
+S_BOX = (
+    b"c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv",
+    b"\xca\x82\xc9}\xfaYG\xf0\xad\xd4\xa2\xaf\x9c\xa4r\xc0",
+    b"\xb7\xfd\x93&6?\xf7\xcc4\xa5\xe5\xf1q\xd81\x15",
+    b"\x04\xc7#\xc3\x18\x96\x05\x9a\x07\x12\x80\xe2\xeb'\xb2u",
+    b"\t\x83,\x1a\x1bnZ\xa0R;\xd6\xb3)\xe3/\x84",
+    b"S\xd1\x00\xed \xfc\xb1[j\xcb\xbe9JLX\xcf",
+    b"\xd0\xef\xaa\xfbCM3\x85E\xf9\x02\x7fP<\x9f\xa8",
+    b"Q\xa3@\x8f\x92\x9d8\xf5\xbc\xb6\xda!\x10\xff\xf3\xd2",
+    b"\xcd\x0c\x13\xec_\x97D\x17\xc4\xa7~=d]\x19s",
+    b'`\x81O\xdc"*\x90\x88F\xee\xb8\x14\xde^\x0b\xdb',
+    b"\xe02:\nI\x06$\\\xc2\xd3\xacb\x91\x95\xe4y",
+    b"\xe7\xc87m\x8d\xd5N\xa9lV\xf4\xeaez\xae\x08",
+    b"\xbax%.\x1c\xa6\xb4\xc6\xe8\xddt\x1fK\xbd\x8b\x8a",
+    b"p>\xb5fH\x03\xf6\x0ea5W\xb9\x86\xc1\x1d\x9e",
+    b"\xe1\xf8\x98\x11i\xd9\x8e\x94\x9b\x1e\x87\xe9\xceU(\xdf",
+    b"\x8c\xa1\x89\r\xbf\xe6BhA\x99-\x0f\xb0T\xbb\x16",
+)
 
 
-class AES():
+class AES:
     """TinyLoRA AES Implementation
     Functions in this implementation are from and/or derived from AES-Python
     (https://github.com/bozhu/AES-Python) and TinyLoRa ()
@@ -96,8 +99,8 @@ class AES():
             block_a[8] = self._device_address[1]
             block_a[9] = self._device_address[0]
             # block from frame counter
-            block_a[10] = (self.frame_counter & 0x00FF)
-            block_a[11] = ((self.frame_counter >> 8) & 0x00FF)
+            block_a[10] = self.frame_counter & 0x00FF
+            block_a[11] = (self.frame_counter >> 8) & 0x00FF
             block_a[12] = 0x00
             block_a[13] = 0x00
             block_a[14] = 0x00
@@ -124,10 +127,12 @@ class AES():
         :param bytearray data: Data array.
         :param bytearray key: Round Key Array.
         """
-        state = [['0', '0', '0', '0'],
-                 ['0', '0', '0', '0'],
-                 ['0', '0', '0', '0'],
-                 ['0', '0', '0', '0']]
+        state = [
+            ["0", "0", "0", "0"],
+            ["0", "0", "0", "0"],
+            ["0", "0", "0", "0"],
+            ["0", "0", "0", "0"],
+        ]
         # Copy Data to State Array for manipulation
         for col in range(4):
             for row in range(4):
@@ -169,9 +174,9 @@ class AES():
         while num_round != 1:
             b = round_const & 0x80
             round_const <<= 1
-            round_const &= 0xff
+            round_const &= 0xFF
             if b == 0x80:
-                round_const ^= 0x1b
+                round_const ^= 0x1B
             num_round -= 1
         # Calculate first temp
         tmp_arr[0] = self._aes_sub_byte(round_key[12 + 1])
@@ -202,8 +207,8 @@ class AES():
         from the AES S_BOX.
         :param byte sub_byte: byte to be replaced with S_BOX byte.
         """
-        row = ((sub_byte >> 4) & 0x0F)
-        col = (sub_byte & 0x0F)
+        row = (sub_byte >> 4) & 0x0F
+        col = sub_byte & 0x0F
         return S_BOX[row][col]
 
     def _aes_sub_bytes(self, state):
@@ -238,9 +243,24 @@ class AES():
         """AES ShiftRows Step: State array's bytes shifted to the left.
         :param bytearray state: State array.
         """
-        arr[0][1], arr[1][1], arr[2][1], arr[3][1] = arr[1][1], arr[2][1], arr[3][1], arr[0][1]
-        arr[0][2], arr[1][2], arr[2][2], arr[3][2] = arr[2][2], arr[3][2], arr[0][2], arr[1][2]
-        arr[0][3], arr[1][3], arr[2][3], arr[3][3] = arr[3][3], arr[0][3], arr[1][3], arr[2][3]
+        arr[0][1], arr[1][1], arr[2][1], arr[3][1] = (
+            arr[1][1],
+            arr[2][1],
+            arr[3][1],
+            arr[0][1],
+        )
+        arr[0][2], arr[1][2], arr[2][2], arr[3][2] = (
+            arr[2][2],
+            arr[3][2],
+            arr[0][2],
+            arr[1][2],
+        )
+        arr[0][3], arr[1][3], arr[2][3], arr[3][3] = (
+            arr[3][3],
+            arr[0][3],
+            arr[1][3],
+            arr[2][3],
+        )
 
     def calculate_mic(self, lora_packet, lora_packet_length, mic):
         """Calculates the validity of data messages, generates a message integrity check bytearray.
@@ -255,8 +275,8 @@ class AES():
         block_b[7] = self._device_address[2]
         block_b[8] = self._device_address[1]
         block_b[9] = self._device_address[0]
-        block_b[10] = (self.frame_counter & 0x00FF)
-        block_b[11] = ((self.frame_counter >> 8) & 0x00FF)
+        block_b[10] = self.frame_counter & 0x00FF
+        block_b[11] = (self.frame_counter >> 8) & 0x00FF
         block_b[15] = lora_packet_length
         # calculate num. of blocks and blocksz of last block
         num_blocks = lora_packet_length // 16
@@ -354,7 +374,7 @@ class AES():
             else:
                 overflow = 0
             # shift 1b left
-            data[i] = ((data[i] << 1) + overflow)&0xff
+            data[i] = ((data[i] << 1) + overflow) & 0xFF
 
     @staticmethod
     def _xor_data(new_data, old_data):
