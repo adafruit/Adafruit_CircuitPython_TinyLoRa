@@ -169,20 +169,26 @@ class TinyLoRa:
         self._modemcfg = None
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
+        # pylint: disable=import-outside-toplevel
         if "US" in ttn_config.country:
             from adafruit_tinylora.ttn_usa import TTN_FREQS
+
             self._frequencies = TTN_FREQS
         elif ttn_config.country == "AS":
             from adafruit_tinylora.ttn_as import TTN_FREQS
+
             self._frequencies = TTN_FREQS
         elif ttn_config.country == "AU":
             from adafruit_tinylora.ttn_au import TTN_FREQS
+
             self._frequencies = TTN_FREQS
         elif ttn_config.country == "EU":
             from adafruit_tinylora.ttn_eu import TTN_FREQS
+
             self._frequencies = TTN_FREQS
         else:
             raise TypeError("Country Code Incorrect/Unsupported")
+        # pylint: enable=import-outside-toplevel
         # Set Channel Number
         self._channel = channel
         self._tx_random = randint(0, 7)
@@ -193,23 +199,22 @@ class TinyLoRa:
         self.frame_counter = 0
         # Set up RFM9x for LoRa Mode
         for pair in (
-                (_REG_OPERATING_MODE, _MODE_SLEEP),
-                (_REG_OPERATING_MODE, _MODE_LORA),
-                (_REG_PA_CONFIG, 0xFF),
-                (_REG_PREAMBLE_DETECT, 0x25),
-                (_REG_PREAMBLE_MSB, 0x00),
-                (_REG_PREAMBLE_LSB, 0x08),
-                (_REG_MODEM_CONFIG, 0x0C),
-                (_REG_TIMER1_COEF, 0x34),
-                (_REG_NODE_ADDR, 0x27),
-                (_REG_IMAGE_CAL, 0x1D),
-                (_REG_RSSI_CONFIG, 0x80),
-                (_REG_RSSI_COLLISION, 0x00),
+            (_REG_OPERATING_MODE, _MODE_SLEEP),
+            (_REG_OPERATING_MODE, _MODE_LORA),
+            (_REG_PA_CONFIG, 0xFF),
+            (_REG_PREAMBLE_DETECT, 0x25),
+            (_REG_PREAMBLE_MSB, 0x00),
+            (_REG_PREAMBLE_LSB, 0x08),
+            (_REG_MODEM_CONFIG, 0x0C),
+            (_REG_TIMER1_COEF, 0x34),
+            (_REG_NODE_ADDR, 0x27),
+            (_REG_IMAGE_CAL, 0x1D),
+            (_REG_RSSI_CONFIG, 0x80),
+            (_REG_RSSI_COLLISION, 0x00),
         ):
             self._write_u8(pair[0], pair[1])
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
-
 
     def __enter__(self):
         return self
@@ -296,14 +301,14 @@ class TinyLoRa:
             self._rfm_msb = self._frequencies[self._tx_random][0]
         # Set up frequency registers
         for pair in (
-                (_REG_FRF_MSB, self._rfm_msb),
-                (_REG_FRF_MID, self._rfm_mid),
-                (_REG_FRF_LSB, self._rfm_lsb),
-                (_REG_FEI_LSB, self._sf),
-                (_REG_FEI_MSB, self._bw),
-                (_REG_MODEM_CONFIG, self._modemcfg),
-                (_REG_PAYLOAD_LENGTH, packet_length),
-                (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR),
+            (_REG_FRF_MSB, self._rfm_msb),
+            (_REG_FRF_MID, self._rfm_mid),
+            (_REG_FRF_LSB, self._rfm_lsb),
+            (_REG_FEI_LSB, self._sf),
+            (_REG_FEI_MSB, self._bw),
+            (_REG_MODEM_CONFIG, self._modemcfg),
+            (_REG_PAYLOAD_LENGTH, packet_length),
+            (_REG_FIFO_POINTER, _REG_FIFO_BASE_ADDR),
         ):
             self._write_u8(pair[0], pair[1])
         # fill the FIFO buffer with the LoRa payload
