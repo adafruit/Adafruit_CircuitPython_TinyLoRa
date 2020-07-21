@@ -130,7 +130,7 @@ class TinyLoRa:
     _BUFFER = bytearray(2)
 
     # pylint: disable=too-many-arguments
-    def __init__(self, spi, cs, irq, rst, ttn_config, channel=None):
+    def __init__(self, spi, cs, irq, rst, ttn_config, channel=None, fport=1):
         """Interface for a HopeRF RFM95/6/7/8(w) radio module. Sets module up for sending to
         The Things Network.
 
@@ -191,6 +191,7 @@ class TinyLoRa:
         # pylint: enable=import-outside-toplevel
         # Set Channel Number
         self._channel = channel
+        self._fport = fport
         self._tx_random = randint(0, 7)
         if self._channel is not None:
             # set single channel
@@ -243,6 +244,7 @@ class TinyLoRa:
            :param timeout: TxDone wait time, default is 2.
         """
         # data packet
+        fport = self._fport
         enc_data = bytearray(data_length)
         lora_pkt = bytearray(64)
         # copy bytearray into bytearray for encryption
@@ -265,7 +267,7 @@ class TinyLoRa:
         lora_pkt[5] = 0
         lora_pkt[6] = frame_counter & 0x00FF
         lora_pkt[7] = (frame_counter >> 8) & 0x00FF
-        lora_pkt[8] = 0x01
+        lora_pkt[8] = int('0x{0:02x}'.format(self._fport))
         # set length of LoRa packet
         lora_pkt_len = 9
         # load encrypted data into lora_pkt
