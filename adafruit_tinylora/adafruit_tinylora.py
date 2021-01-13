@@ -1,20 +1,7 @@
-# Copyright 2015, 2016 Ideetron B.V.
+# SPDX-FileCopyrightText: 2015-2016 Ideetron B.V.
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#
-# Modified by Brent Rubell for Adafruit Industries.
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 `Adafruit_TinyLoRa`
 ====================================================
@@ -81,8 +68,7 @@ _FSTEP = 32000000.0 / 524288
 
 
 class TTN:
-    """TTN Class
-    """
+    """TTN Class"""
 
     def __init__(self, dev_address, net_key, app_key, country="US"):
         """Interface for TheThingsNetwork
@@ -98,33 +84,28 @@ class TTN:
 
     @property
     def country(self):
-        """Returns the TTN Frequency Country.
-        """
+        """Returns the TTN Frequency Country."""
         return self.region
 
     @property
     def device_address(self):
-        """Returns the TTN Device Address.
-        """
+        """Returns the TTN Device Address."""
         return self.dev_addr
 
     @property
     def application_key(self):
-        """Returns the TTN Application Key.
-        """
+        """Returns the TTN Application Key."""
         return self.app_key
 
     @property
     def network_key(self):
-        """Returns the TTN Network Key.
-        """
+        """Returns the TTN Network Key."""
         return self.net_key
 
 
 # pylint: disable=too-many-instance-attributes
 class TinyLoRa:
-    """TinyLoRa Interface
-    """
+    """TinyLoRa Interface"""
 
     # SPI Write Buffer
     _BUFFER = bytearray(2)
@@ -237,10 +218,10 @@ class TinyLoRa:
 
     def send_data(self, data, data_length, frame_counter, timeout=2):
         """Function to assemble and send data
-           :param data: data to send
-           :param data_length: length of data to send
-           :param frame_counter: frame counter variable, declared in code.py.
-           :param timeout: TxDone wait time, default is 2.
+        :param data: data to send
+        :param data_length: length of data to send
+        :param frame_counter: frame counter variable, declared in code.py.
+        :param timeout: TxDone wait time, default is 2.
         """
         # data packet
         enc_data = bytearray(data_length)
@@ -283,9 +264,9 @@ class TinyLoRa:
 
     def send_packet(self, lora_packet, packet_length, timeout):
         """Sends a LoRa packet using the RFM Module
-          :param bytearray lora_packet: assembled LoRa packet from send_data
-          :param int packet_length: length of LoRa packet to send
-          :param int timeout: TxDone wait time.
+        :param bytearray lora_packet: assembled LoRa packet from send_data
+        :param int packet_length: length of LoRa packet to send
+        :param int timeout: TxDone wait time.
         """
         # Set RFM to standby
         self._write_u8(_MODE_STDBY, 0x81)
@@ -342,8 +323,8 @@ class TinyLoRa:
         }
         try:
             self._sf, self._bw, self._modemcfg = data_rates[datarate]
-        except KeyError:
-            raise KeyError("Invalid or Unsupported Datarate.")
+        except KeyError as err:
+            raise KeyError("Invalid or Unsupported Datarate.") from err
 
     def set_channel(self, channel):
         """Sets the RFM Channel (if single-channel)
