@@ -186,6 +186,10 @@ class TinyLoRa:
             from adafruit_tinylora.ttn_eu import TTN_FREQS
 
             self._frequencies = TTN_FREQS
+        elif ttn_config.country == "CN":
+            from adafruit_tinylora.ttn_cn import TTN_FREQS
+
+            self._frequencies = TTN_FREQS
         else:
             raise TypeError("Country Code Incorrect/Unsupported")
         # pylint: enable=import-outside-toplevel
