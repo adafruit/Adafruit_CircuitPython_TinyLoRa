@@ -1,24 +1,8 @@
-# AES-Python, Copyright (C) 2012 Bo Zhu http://about.bozhu.me
+# SPDX-FileCopyrightText: 2012 Bo Zhu
+# SPDX-FileCopyrightText: Brent Rubell for Adafruit Industries
 #
-# Permission is hereby granted, free of charge, to any person obtaining a
-# copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-# DEALINGS IN THE SOFTWARE.
-#
-# Modified by Brent Rubell for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 """
 `adafruit_tinylora_encryption.py`
 ======================================================
@@ -28,8 +12,7 @@ Message Integrity checks.
 """
 # from http://cs.ucsb.edu/~koc/cs178/projects/JT/aes.c
 def xtime(col):
-    """xtime impl. for _mix_single_column()
-    """
+    """xtime impl. for _mix_single_column()"""
     return (((col << 1) ^ 0x1B) & 0xFF) if (col & 0x80) else (col << 1)
 
 
@@ -263,8 +246,7 @@ class AES:
         )
 
     def calculate_mic(self, lora_packet, lora_packet_length, mic):
-        """Calculates the validity of data messages, generates a message integrity check bytearray.
-        """
+        """Calculates the validity of data messages, generates message integrity check bytearray."""
         block_b = bytearray(16)
         key_k1 = bytearray(16)
         key_k2 = bytearray(16)
@@ -363,8 +345,7 @@ class AES:
 
     @staticmethod
     def _shift_left(data):
-        """ Shifts data bytearray left by 1
-        """
+        """Shifts data bytearray left by 1"""
         for i in range(16):
             if i < 15:
                 if (data[i + 1] & 0x80) == 0x80:
@@ -378,7 +359,7 @@ class AES:
 
     @staticmethod
     def _xor_data(new_data, old_data):
-        """ XOR two data arrays
+        """XOR two data arrays
         :param bytearray new_data: Calculated data.
         :param bytearray old_data: data to be xor'd.
         """
