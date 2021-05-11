@@ -167,6 +167,10 @@ class TinyLoRa:
             from adafruit_tinylora.ttn_eu import TTN_FREQS
 
             self._frequencies = TTN_FREQS
+        elif ttn_config.country == "EU433":
+            from adafruit_tinylora.ttn_eu433 import TTN_FREQS
+
+            self._frequencies = TTN_FREQS
         elif ttn_config.country == "CN":
             from adafruit_tinylora.ttn_cn import TTN_FREQS
 
