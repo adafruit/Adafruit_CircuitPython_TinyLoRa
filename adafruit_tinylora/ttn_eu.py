@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`ttn_eu.py`
+`ttn_eu`
 ======================================================
 The Things Network Frequency Plans - EU863
 * Author(s): Brent Rubell

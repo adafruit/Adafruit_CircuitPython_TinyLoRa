@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`ttn_cn.py`
+`ttn_cn`
 ======================================================
 The Things Network Frequency Plans - CN470
 * Author(s): IAMLIUBO

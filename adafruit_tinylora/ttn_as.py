@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`ttn_as.py`
+`ttn_as`
 ======================================================
 AS920 The Things Network Frequency Plans
 * Author(s): Brent Rubell

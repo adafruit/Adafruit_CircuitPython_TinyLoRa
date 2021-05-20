@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`ttn_au.py`
+`ttn_au`
 ======================================================
 The Things Network Frequency Plans - AU915
 * Author(s): Brent Rubell
