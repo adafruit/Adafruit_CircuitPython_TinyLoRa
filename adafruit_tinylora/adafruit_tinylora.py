@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 """
-`Adafruit_TinyLoRa`
+`adafruit_tinylora`
 ====================================================
 CircuitPython LoRaWAN implementation for use with
 The Things Network.

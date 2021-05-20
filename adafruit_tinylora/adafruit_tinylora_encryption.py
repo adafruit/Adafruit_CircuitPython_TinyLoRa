@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`adafruit_tinylora_encryption.py`
+`adafruit_tinylora_encryption`
 ======================================================
 Required tinyLoRA Encryption Methods for AES and
 Message Integrity checks.

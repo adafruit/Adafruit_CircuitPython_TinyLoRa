@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-`ttn_usa.py`
+`ttn_usa`
 ======================================================
 The Things Network Frequency Plans - US902
 * Author(s): Brent Rubell
