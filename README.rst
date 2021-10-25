@@ -57,6 +57,11 @@ Usage is described in the `learn guide for this library <https://learn.adafruit.
 
 
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/tinylora/en/latest/>`_.
+
 Contributing
 ============
 
