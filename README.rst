@@ -13,7 +13,10 @@ Introduction
     :target: https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa/actions/
     :alt: Build Status
 
-LoRaWAN/The Things Network, for CircuitPython.
+**WARNING: This library is not compatible with The Things Network v3 stack. Since TTN has fully migrated to v3, this library is not longer able to communicate with TTN.**
+
+
+LoRaWAN/The Things Network V2, for CircuitPython.
 
 Dependencies
 =============
