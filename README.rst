@@ -2,7 +2,7 @@ Introduction
 ============
 
 .. image:: https://readthedocs.org/projects/circuitpython-tinylora/badge/?version=latest
-    :target: https://circuitpython.readthedocs.io/projects/tinylora/en/latest/
+    :target: https://docs.circuitpython.org/projects/tinylora/en/latest/
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/discord/327254708534116352.svg
@@ -63,7 +63,7 @@ Usage is described in the `learn guide for this library <https://learn.adafruit.
 Documentation
 =============
 
-API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/tinylora/en/latest/>`_.
+API documentation for this library can be found on `Read the Docs <https://docs.circuitpython.org/projects/tinylora/en/latest/>`_.
 
 Contributing
 ============
