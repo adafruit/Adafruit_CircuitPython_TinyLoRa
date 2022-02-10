@@ -65,22 +65,11 @@ Documentation
 
 API documentation for this library can be found on `Read the Docs <https://docs.circuitpython.org/projects/tinylora/en/latest/>`_.
 
+For information on building library documentation, please check out `this guide <https://learn.adafruit.com/creating-and-sharing-a-circuitpython-library/sharing-our-docs-on-readthedocs#sphinx-5-1>`_.
+
 Contributing
 ============
 
 Contributions are welcome! Please read our `Code of Conduct
 <https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa/blob/main/CODE_OF_CONDUCT.md>`_
 before contributing to help this project stay welcoming.
-
-Documentation
-=============
-
-For information on building library documentation, please check out `this guide <https://learn.adafruit.com/creating-and-sharing-a-circuitpython-library/sharing-our-docs-on-readthedocs#sphinx-5-1>`_.
-
-License
-=======
-This library was written by ClemensRiederer. We've converted it to work with Adafruit CircuitPython and made
-changes so it works with the Raspberry Pi and Adafruit Feather M0/M4. We've added examples for using this library
-to transmit data and sensor data to The Things Network.
-
-This open source code is licensed under the LGPL license (see LICENSE for details).
