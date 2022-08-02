@@ -13,6 +13,10 @@ Introduction
     :target: https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa/actions/
     :alt: Build Status
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+    :alt: Code Style: Black
+
 **WARNING: This library is not compatible with The Things Network v3 stack. Since TTN has fully migrated to v3, this library is not longer able to communicate with TTN.**
 
 
