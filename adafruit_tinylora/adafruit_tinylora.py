@@ -110,7 +110,7 @@ class TinyLoRa:
     # SPI Write Buffer
     _BUFFER = bytearray(2)
 
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,invalid-name
     def __init__(self, spi, cs, irq, rst, ttn_config, channel=None):
         """Interface for a HopeRF RFM95/6/7/8(w) radio module. Sets module up for sending to
         The Things Network.
