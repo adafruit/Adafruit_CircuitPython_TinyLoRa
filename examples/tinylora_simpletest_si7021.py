@@ -4,11 +4,21 @@
 """Using TinyLoRa with a Si7021 Sensor.
 """
 import time
+
+import adafruit_si7021
+import board
 import busio
 import digitalio
-import board
-import adafruit_si7021
+
 from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
+
+try:  # typing
+    from typing import Annotated, TypeAlias
+
+    bytearray4: TypeAlias = Annotated[bytearray, 4]
+    bytearray16: TypeAlias = Annotated[bytearray, 16]
+except ImportError:
+    pass
 
 # Board LED
 led = digitalio.DigitalInOut(board.D13)
@@ -32,10 +42,10 @@ rst = digitalio.DigitalInOut(board.D4)
 # rst = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
-devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
+devaddr = bytearray4([0x00, 0x00, 0x00, 0x00])
 
 # TTN Network Key, 16 Bytes, MSB
-nwkey = bytearray(
+nwkey = bytearray16(
     [
         0x00,
         0x00,
@@ -57,7 +67,7 @@ nwkey = bytearray(
 )
 
 # TTN Application Key, 16 Bytess, MSB
-app = bytearray(
+app = bytearray16(
     [
         0x00,
         0x00,
@@ -83,7 +93,7 @@ ttn_config = TTN(devaddr, nwkey, app, country="US")
 lora = TinyLoRa(spi, cs, irq, rst, ttn_config)
 
 # Data Packet to send to TTN
-data = bytearray(4)
+data: bytearray4 = bytearray(4)
 
 while True:
     temp_val = sensor.temperature

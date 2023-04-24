@@ -2,10 +2,17 @@
 # SPDX-License-Identifier: MIT
 
 import time
+
+import board
 import busio
 import digitalio
-import board
+
 from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
+
+try:
+    from adafruit_tinylora.adafruit_tinylora import bytearray4, bytearray16
+except ImportError:
+    pass
 
 # Board LED
 led = digitalio.DigitalInOut(board.D13)
@@ -24,10 +31,10 @@ rst = digitalio.DigitalInOut(board.D4)
 # rst = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
-devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
+devaddr = bytearray4([0x00, 0x00, 0x00, 0x00])
 
 # TTN Network Key, 16 Bytes, MSB
-nwkey = bytearray(
+nwkey = bytearray16(
     [
         0x00,
         0x00,
@@ -49,7 +56,7 @@ nwkey = bytearray(
 )
 
 # TTN Application Key, 16 Bytess, MSB
-app = bytearray(
+app = bytearray16(
     [
         0x00,
         0x00,
