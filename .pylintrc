@@ -219,6 +219,9 @@ indent-after-paren=4
 # tab).
 indent-string='    '
 
+# Names that are allowed even though they violate standard naming conventions.
+good-names=cs
+
 # Maximum number of characters on a single line.
 max-line-length=100
 
