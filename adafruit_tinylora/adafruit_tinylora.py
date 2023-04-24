@@ -297,8 +297,8 @@ class TinyLoRa:
         ):
             self._write_u8(pair[0], pair[1])
         # fill the FIFO buffer with the LoRa payload
-        for k in range(packet_length):
-            self._write_u8(0x00, lora_packet[k])
+        for packet_index in range(packet_length):
+            self._write_u8(0x00, lora_packet[packet_index])
         # switch RFM to TX operating mode
         self._write_u8(_REG_OPERATING_MODE, _MODE_TX)
         # wait for TxDone IRQ, poll for timeout.
