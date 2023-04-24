@@ -66,10 +66,10 @@ class AES:
         incomplete_block_size = len(data) % 16
         if incomplete_block_size != 0:
             num_blocks += 1
-        # k = data ptr
-        k = 0
-        i = 1
-        while i <= num_blocks:
+
+        data_pointer = 0
+        block_counter = 1
+        while block_counter <= num_blocks:
             block_a[0] = 0x01
             block_a[1] = 0x00
             block_a[2] = 0x00
@@ -87,21 +87,21 @@ class AES:
             block_a[12] = 0x00
             block_a[13] = 0x00
             block_a[14] = 0x00
-            block_a[15] = i
+            block_a[15] = block_counter
             # calculate S
             self._aes_encrypt(block_a, self._app_key)
             # check for last block
-            if i != num_blocks:
-                for j in range(16):
-                    data[k] ^= block_a[j]
-                    k += 1
+            if block_counter != num_blocks:
+                for byte_index in range(16):
+                    data[data_pointer] ^= block_a[byte_index]
+                    data_pointer += 1
             else:
                 if incomplete_block_size == 0:
                     incomplete_block_size = 16
-                for j in range(incomplete_block_size):
-                    data[k] ^= block_a[j]
-                    k += 1
-            i += 1
+                for byte_index in range(incomplete_block_size):
+                    data[data_pointer] ^= block_a[byte_index]
+                    data_pointer += 1
+            block_counter += 1
 
     def _aes_encrypt(self, data, key):
         """Performs 9 rounds of AES encryption on data per TinyLoRa spec.
@@ -155,10 +155,10 @@ class AES:
         round_const = 0x01
         # add round_const calculation
         while num_round != 1:
-            b = round_const & 0x80
+            byte = round_const & 0x80
             round_const <<= 1
             round_const &= 0xFF
-            if b == 0x80:
+            if byte == 0x80:
                 round_const ^= 0x1B
             num_round -= 1
         # Calculate first temp
@@ -169,10 +169,10 @@ class AES:
         # XOR tmp_arr[0] wth round_const first
         tmp_arr[0] ^= round_const
         # then calculate new round key
-        for i in range(4):
-            for j in range(4):
-                round_key[j + (i << 2)] ^= tmp_arr[j]
-                tmp_arr[j] = round_key[j + (i << 2)]
+        for row in range(4):
+            for col in range(4):
+                round_key[col + (row << 2)] ^= tmp_arr[col]
+                tmp_arr[col] = round_key[col + (row << 2)]
 
     @staticmethod
     def _aes_add_round_key(round_key, state):
@@ -218,8 +218,8 @@ class AES:
         """AES MixColumns Step: Multiplies each column of the state array with xtime.
         :param bytearray state: State array.
         """
-        for i in range(4):
-            self._mix_single_column(state[i])
+        for column_index in range(4):
+            self._mix_single_column(state[column_index])
 
     @staticmethod
     def _aes_shift_rows(arr):
@@ -270,30 +270,30 @@ class AES:
         # aes encryption on block_b
         self._aes_encrypt(block_b, self._network_key)
         # copy block_b to old_data
-        for i in range(16):
-            old_data[i] = block_b[i]
+        for byte_index in range(16):
+            old_data[byte_index] = block_b[byte_index]
         block_counter = 1
         # calculate until n-1 packet blocks
-        k = 0  # ptr
+        data_pointer = 0
         while block_counter < num_blocks:
             # copy data into array
-            for i in range(16):
-                new_data[i] = lora_packet[k]
-                k += 1
+            for byte_index in range(16):
+                new_data[byte_index] = lora_packet[data_pointer]
+                data_pointer += 1
             # XOR new_data with old_data
             self._xor_data(new_data, old_data)
             # aes encrypt new_data
             self._aes_encrypt(new_data, self._network_key)
             # copy new_data to old_data
-            for i in range(16):
-                old_data[i] = new_data[i]
+            for byte_index in range(16):
+                old_data[byte_index] = new_data[byte_index]
             # increase block_counter
             block_counter += 1
         # perform calculation on last block
         if incomplete_block_size == 0:
-            for i in range(16):
-                new_data[i] = lora_packet[k]
-                k += 1
+            for byte_index in range(16):
+                new_data[byte_index] = lora_packet[data_pointer]
+                data_pointer += 1
             # xor with key 1
             self._xor_data(new_data, key_k1)
             # xor with old data
@@ -302,14 +302,14 @@ class AES:
             self._aes_encrypt(new_data, self._network_key)
         else:
             # copy the remaining data
-            for i in range(16):
-                if i < incomplete_block_size:
-                    new_data[i] = lora_packet[k]
-                    k += 1
-                if i == incomplete_block_size:
-                    new_data[i] = 0x80
-                if i > incomplete_block_size:
-                    new_data[i] = 0x00
+            for byte_index in range(16):
+                if byte_index < incomplete_block_size:
+                    new_data[byte_index] = lora_packet[data_pointer]
+                    data_pointer += 1
+                if byte_index == incomplete_block_size:
+                    new_data[byte_index] = 0x80
+                if byte_index > incomplete_block_size:
+                    new_data[byte_index] = 0x00
             # perform xor with key 2
             self._xor_data(new_data, key_k2)
             # perform xor with old data
@@ -346,16 +346,16 @@ class AES:
     @staticmethod
     def _shift_left(data):
         """Shifts data bytearray left by 1"""
-        for i in range(16):
-            if i < 15:
-                if (data[i + 1] & 0x80) == 0x80:
+        for byte_index in range(16):
+            if byte_index < 15:
+                if (data[byte_index + 1] & 0x80) == 0x80:
                     overflow = 1
                 else:
                     overflow = 0
             else:
                 overflow = 0
             # shift 1b left
-            data[i] = ((data[i] << 1) + overflow) & 0xFF
+            data[byte_index] = ((data[byte_index] << 1) + overflow) & 0xFF
 
     @staticmethod
     def _xor_data(new_data, old_data):
@@ -363,5 +363,5 @@ class AES:
         :param bytearray new_data: Calculated data.
         :param bytearray old_data: data to be xor'd.
         """
-        for i in range(16):
-            new_data[i] ^= old_data[i]
+        for byte_index in range(16):
+            new_data[byte_index] ^= old_data[byte_index]
