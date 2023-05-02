@@ -34,10 +34,10 @@ rst = digitalio.DigitalInOut(board.D4)
 # rst = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
-devaddr = bytearray4([0x00, 0x00, 0x00, 0x00])
+devaddr: bytearray4 = bytearray([0x00, 0x00, 0x00, 0x00])
 
 # TTN Network Key, 16 Bytes, MSB
-nwkey = bytearray16(
+nwkey: bytearray16 = bytearray(
     [
         0x00,
         0x00,
@@ -59,7 +59,7 @@ nwkey = bytearray16(
 )
 
 # TTN Application Key, 16 Bytess, MSB
-app = bytearray16(
+app: bytearray16 = bytearray(
     [
         0x00,
         0x00,
@@ -85,7 +85,7 @@ ttn_config = TTN(devaddr, nwkey, app, country="US")
 lora = TinyLoRa(spi, cs, irq, rst, ttn_config)
 
 while True:
-    data = bytearray4(b"\x43\x57\x54\x46")
+    data: bytearray4 = bytearray(b"\x43\x57\x54\x46")
     print("Sending packet...")
     lora.send_data(data, len(data), lora.frame_counter)
     print("Packet sent!")

@@ -30,25 +30,8 @@ def xtime(col: int) -> int:
 
 
 # AES S-box
-# NOTE(typing): Each of these is 16b, can use bytearray16 here
-S_BOX: Tuple[
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-    bytes,
-] = (
+# NOTE(typing): Each of these 16 items is 16b, can use bytearray16 here
+S_BOX: Tuple[bytes, ...] = (
     b"c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv",
     b"\xca\x82\xc9}\xfaYG\xf0\xad\xd4\xa2\xaf\x9c\xa4r\xc0",
     b"\xb7\xfd\x93&6?\xf7\xcc4\xa5\xe5\xf1q\xd81\x15",

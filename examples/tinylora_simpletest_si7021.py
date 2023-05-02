@@ -42,10 +42,10 @@ rst = digitalio.DigitalInOut(board.D4)
 # rst = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
-devaddr = bytearray4([0x00, 0x00, 0x00, 0x00])
+devaddr: bytearray4 = bytearray([0x00, 0x00, 0x00, 0x00])
 
 # TTN Network Key, 16 Bytes, MSB
-nwkey = bytearray16(
+nwkey: bytearray16 = bytearray(
     [
         0x00,
         0x00,
@@ -67,7 +67,7 @@ nwkey = bytearray16(
 )
 
 # TTN Application Key, 16 Bytess, MSB
-app = bytearray16(
+app: bytearray16 = bytearray(
     [
         0x00,
         0x00,

@@ -417,6 +417,3 @@ class TinyLoRa:
             self._BUFFER[1] = val
             # pylint: disable=no-member
             device.write(self._BUFFER, end=2)
-            # pylint: disable=no-member
-            device.write(self._BUFFER, end=2)
-            device.write(self._BUFFER, end=2)
