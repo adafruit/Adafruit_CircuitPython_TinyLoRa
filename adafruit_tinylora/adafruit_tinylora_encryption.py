@@ -10,6 +10,8 @@ Required tinyLoRA Encryption Methods for AES and
 Message Integrity checks.
 * Author(s): adafruit
 """
+
+
 # from http://cs.ucsb.edu/~koc/cs178/projects/JT/aes.c
 def xtime(col):
     """xtime impl. for _mix_single_column()"""
