@@ -27,9 +27,30 @@ Implementation Notes
 
 import time
 from random import randint
-from micropython import const
+
 import adafruit_bus_device.spi_device
+from micropython import const
+
 from adafruit_tinylora.adafruit_tinylora_encryption import AES
+
+try:  # typing
+    from types import TracebackType
+    from typing import Optional, Type, Union
+
+    import busio
+    import digitalio
+    from typing_extensions import Self  # Python <3.11
+    from typing_extensions import Annotated, TypeAlias
+
+    # type aliases
+    bytearray2: TypeAlias = Annotated[bytearray, 2]
+    bytearray4: TypeAlias = Annotated[bytearray, 4]
+    bytearray16: TypeAlias = Annotated[bytearray, 16]
+
+    registeraddress: TypeAlias = Union[const, int]
+except ImportError:
+    pass
+
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_TinyLoRa.git"
@@ -70,7 +91,13 @@ _FSTEP = 32000000.0 / 524288
 class TTN:
     """TTN Class"""
 
-    def __init__(self, dev_address, net_key, app_key, country="US"):
+    def __init__(
+        self,
+        dev_address: bytearray4,
+        net_key: bytearray16,
+        app_key: bytearray16,
+        country: str = "US",
+    ):
         """Interface for TheThingsNetwork
         :param bytearray dev_address: TTN Device Address.
         :param bytearray net_key: TTN Network Key.
@@ -83,22 +110,22 @@ class TTN:
         self.region = country
 
     @property
-    def country(self):
+    def country(self) -> str:
         """Returns the TTN Frequency Country."""
         return self.region
 
     @property
-    def device_address(self):
+    def device_address(self) -> bytearray4:
         """Returns the TTN Device Address."""
         return self.dev_addr
 
     @property
-    def application_key(self):
+    def application_key(self) -> bytearray16:
         """Returns the TTN Application Key."""
         return self.app_key
 
     @property
-    def network_key(self):
+    def network_key(self) -> bytearray16:
         """Returns the TTN Network Key."""
         return self.net_key
 
@@ -108,10 +135,18 @@ class TinyLoRa:
     """TinyLoRa Interface"""
 
     # SPI Write Buffer
-    _BUFFER = bytearray(2)
+    _BUFFER: bytearray2 = bytearray(2)
 
     # pylint: disable=too-many-arguments,invalid-name
-    def __init__(self, spi, cs, irq, rst, ttn_config, channel=None):
+    def __init__(
+        self,
+        spi: busio.SPI,
+        cs: digitalio.DigitalInOut,
+        irq: digitalio.DigitalInOut,
+        rst: digitalio.DigitalInOut,
+        ttn_config: digitalio.DigitalInOut,
+        channel: Optional[int] = None,
+    ):
         """Interface for a HopeRF RFM95/6/7/8(w) radio module. Sets module up for sending to
         The Things Network.
 
@@ -141,13 +176,13 @@ class TinyLoRa:
         if self._version != 18:
             raise TypeError("Can not detect LoRa Module. Please check wiring!")
         # Set Frequency registers
-        self._rfm_msb = None
-        self._rfm_mid = None
-        self._rfm_lsb = None
+        self._rfm_msb: Optional[registeraddress] = None
+        self._rfm_mid: Optional[registeraddress] = None
+        self._rfm_lsb: Optional[registeraddress] = None
         # Set datarate registers
-        self._sf = None
-        self._bw = None
-        self._modemcfg = None
+        self._sf: Optional[registeraddress] = None
+        self._bw: Optional[registeraddress] = None
+        self._modemcfg: Optional[registeraddress] = None
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
         # pylint: disable=import-outside-toplevel
@@ -201,13 +236,18 @@ class TinyLoRa:
         # Give the lora object ttn configuration
         self._ttn_config = ttn_config
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(
+        self,
+        exception_type: Optional[Type[type]],
+        exception_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
         self.deinit()
 
-    def deinit(self):
+    def deinit(self) -> None:
         """Deinitializes the TinyLoRa object properties and pins."""
         self._irq = None
         self._rst = None
@@ -220,7 +260,9 @@ class TinyLoRa:
         self._bw = None
         self._modemcfg = None
 
-    def send_data(self, data, data_length, frame_counter, timeout=2):
+    def send_data(
+        self, data: bytearray, data_length: int, frame_counter: int, timeout: int = 2
+    ) -> None:
         """Function to assemble and send data
         :param data: data to send
         :param data_length: length of data to send
@@ -258,7 +300,7 @@ class TinyLoRa:
         # recalculate packet length
         lora_pkt_len += data_length
         # Calculate MIC
-        mic = bytearray(4)
+        mic: bytearray4 = bytearray(4)
         mic = aes.calculate_mic(lora_pkt, lora_pkt_len, mic)
         # load mic in package
         lora_pkt[lora_pkt_len : lora_pkt_len + 4] = mic[0:4]
@@ -266,7 +308,9 @@ class TinyLoRa:
         lora_pkt_len += 4
         self.send_packet(lora_pkt, lora_pkt_len, timeout)
 
-    def send_packet(self, lora_packet, packet_length, timeout):
+    def send_packet(
+        self, lora_packet: bytearray, packet_length: int, timeout: int
+    ) -> None:
         """Sends a LoRa packet using the RFM Module
         :param bytearray lora_packet: assembled LoRa packet from send_data
         :param int packet_length: length of LoRa packet to send
@@ -312,10 +356,11 @@ class TinyLoRa:
         if timed_out:
             raise RuntimeError("Timeout during packet send")
 
-    def set_datarate(self, datarate):
+    def set_datarate(self, datarate: str) -> None:
         """Sets the RFM Datarate
         :param datarate: Bandwidth and Frequency Plan
         """
+        # TODO: Convert these to enum
         data_rates = {
             "SF7BW125": (0x74, 0x72, 0x04),
             "SF7BW250": (0x74, 0x82, 0x04),
@@ -330,13 +375,15 @@ class TinyLoRa:
         except KeyError as err:
             raise KeyError("Invalid or Unsupported Datarate.") from err
 
-    def set_channel(self, channel):
+    def set_channel(self, channel: int) -> None:
         """Sets the RFM Channel (if single-channel)
         :param int channel: Transmit Channel (0 through 7).
         """
         self._rfm_msb, self._rfm_mid, self._rfm_lsb = self._frequencies[channel]
 
-    def _read_into(self, address, buf, length=None):
+    def _read_into(
+        self, address: registeraddress, buf: bytearray2, length: Optional[int] = None
+    ) -> None:
         """Read a number of bytes from the specified address into the
         provided buffer. If length is not specified (default) the entire buffer
         will be filled.
@@ -353,14 +400,14 @@ class TinyLoRa:
             device.write(self._BUFFER, end=1)
             device.readinto(buf, end=length)
 
-    def _read_u8(self, address):
+    def _read_u8(self, address: registeraddress) -> int:
         """Read a single byte from the provided address and return it.
         :param bytearray address: Register Address.
         """
         self._read_into(address, self._BUFFER, length=1)
         return self._BUFFER[0]
 
-    def _write_u8(self, address, val):
+    def _write_u8(self, address: registeraddress, val: int) -> None:
         """Writes to the RFM register given an address and data.
         :param bytearray address: Register Address.
         :param val: Data to write.

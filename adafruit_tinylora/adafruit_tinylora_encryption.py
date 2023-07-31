@@ -11,15 +11,28 @@ Message Integrity checks.
 * Author(s): adafruit
 """
 
+try:  # typing
+    from typing import Annotated, List, Tuple, TypeAlias
+
+    # pylint: disable=invalid-name
+    bytearray2: TypeAlias = Annotated[bytearray, 2]
+    bytearray4: TypeAlias = Annotated[bytearray, 4]
+    bytearray16: TypeAlias = Annotated[bytearray, 16]
+
+    StateMatrix: TypeAlias = List[bytearray4]
+except ImportError:
+    pass
+
 
 # from http://cs.ucsb.edu/~koc/cs178/projects/JT/aes.c
-def xtime(col):
+def xtime(col: int) -> int:
     """xtime impl. for _mix_single_column()"""
     return (((col << 1) ^ 0x1B) & 0xFF) if (col & 0x80) else (col << 1)
 
 
 # AES S-box
-S_BOX = (
+# NOTE(typing): Each of these 16 items is 16b, can use bytearray16 here
+S_BOX: Tuple[bytes, ...] = (
     b"c|w{\xf2ko\xc50\x01g+\xfe\xd7\xabv",
     b"\xca\x82\xc9}\xfaYG\xf0\xad\xd4\xa2\xaf\x9c\xa4r\xc0",
     b"\xb7\xfd\x93&6?\xf7\xcc4\xa5\xe5\xf1q\xd81\x15",
@@ -45,20 +58,26 @@ class AES:
     (https://github.com/bozhu/AES-Python) and TinyLoRa ()
     """
 
-    def __init__(self, device_address, app_key, network_key, frame_counter):
+    def __init__(
+        self,
+        device_address: bytearray4,
+        app_key: bytearray16,
+        network_key: bytearray16,
+        frame_counter: int,
+    ):
         self._app_key = app_key
         self._device_address = device_address
         self._network_key = network_key
         self.frame_counter = frame_counter
 
-    def encrypt(self, aes_data):
+    def encrypt(self, aes_data: bytearray) -> bytearray:
         """Performs AES Encryption routine with data.
         :param bytearray data: Data to-be encrypted.
         """
         self.encrypt_payload(aes_data)
         return aes_data
 
-    def encrypt_payload(self, data):
+    def encrypt_payload(self, data: bytearray) -> None:
         """Encrypts data payload.
         :param bytearray data: Data to-be-encrypted.
         """
@@ -105,18 +124,18 @@ class AES:
                     data_pointer += 1
             block_counter += 1
 
-    def _aes_encrypt(self, data, key):
+    def _aes_encrypt(self, data: bytearray, key: bytearray) -> None:
         """Performs 9 rounds of AES encryption on data per TinyLoRa spec.
         NOTE: This is not an accurate aes_encrypt impl., tinylora performs
         an additional key calculation after 9 rounds.
         :param bytearray data: Data array.
         :param bytearray key: Round Key Array.
         """
-        state = [
-            ["0", "0", "0", "0"],
-            ["0", "0", "0", "0"],
-            ["0", "0", "0", "0"],
-            ["0", "0", "0", "0"],
+        state: StateMatrix = [
+            bytearray(b"0000"),
+            bytearray(b"0000"),
+            bytearray(b"0000"),
+            bytearray(b"0000"),
         ]
         # Copy Data to State Array for manipulation
         for col in range(4):
@@ -136,7 +155,9 @@ class AES:
             for col in range(4):
                 data[col + (row << 2)] = state[row][col]
 
-    def _round_encrypt(self, state, key, num_round):
+    def _round_encrypt(
+        self, state: StateMatrix, key: bytearray, num_round: int
+    ) -> None:
         """Performs one round of AES.
         :param bytearray state: State array.
         :param bytearray key: Round key array.
@@ -148,7 +169,7 @@ class AES:
         self._aes_calculate_key(num_round, key)
         self._aes_add_round_key(key, state)
 
-    def _aes_calculate_key(self, num_round, round_key):
+    def _aes_calculate_key(self, num_round: int, round_key: bytearray) -> None:
         """Performs round key calculation per TinyLoRa's spec.
         :param int num_round: Round number
         :param bytearray round_key: Round key array.
@@ -177,7 +198,7 @@ class AES:
                 tmp_arr[col] = round_key[col + (row << 2)]
 
     @staticmethod
-    def _aes_add_round_key(round_key, state):
+    def _aes_add_round_key(round_key: bytearray, state: StateMatrix) -> None:
         """AES AddRoundKey Step: Round_Key combined with the state.
         :param bytearray round_key: Subkey for each round.
         :param bytearray state: State array.
@@ -187,7 +208,7 @@ class AES:
                 state[col][row] ^= round_key[row + (col << 2)]
 
     @staticmethod
-    def _aes_sub_byte(sub_byte):
+    def _aes_sub_byte(sub_byte: int) -> int:
         """Sub-Byte Step: Used for returning specific byte
         from the AES S_BOX.
         :param byte sub_byte: byte to be replaced with S_BOX byte.
@@ -196,7 +217,7 @@ class AES:
         col = sub_byte & 0x0F
         return S_BOX[row][col]
 
-    def _aes_sub_bytes(self, state):
+    def _aes_sub_bytes(self, state: StateMatrix) -> None:
         """AES SubBytes Step: Replace state arr. bytes w/sub-byte from S_BOX
         :param bytearray s: State array.
         """
@@ -205,7 +226,7 @@ class AES:
                 state[row][col] = self._aes_sub_byte(state[row][col])
 
     @staticmethod
-    def _mix_single_column(col):
+    def _mix_single_column(col: bytearray4) -> None:
         """Mixes individual columns with state array
         :param bytearray col: Column from statearray
         """
@@ -216,7 +237,7 @@ class AES:
         col[2] ^= temp ^ xtime(col[2] ^ col[3])
         col[3] ^= temp ^ xtime(col[3] ^ col_zero)
 
-    def _aes_mix_columns(self, state):
+    def _aes_mix_columns(self, state: StateMatrix) -> None:
         """AES MixColumns Step: Multiplies each column of the state array with xtime.
         :param bytearray state: State array.
         """
@@ -224,7 +245,7 @@ class AES:
             self._mix_single_column(state[column_index])
 
     @staticmethod
-    def _aes_shift_rows(arr):
+    def _aes_shift_rows(arr: StateMatrix) -> None:
         """AES ShiftRows Step: State array's bytes shifted to the left.
         :param bytearray state: State array.
         """
@@ -247,7 +268,9 @@ class AES:
             arr[2][3],
         )
 
-    def calculate_mic(self, lora_packet, lora_packet_length, mic):
+    def calculate_mic(
+        self, lora_packet: bytearray, lora_packet_length: int, mic: bytearray4
+    ) -> bytearray4:
         """Calculates the validity of data messages, generates message integrity check bytearray."""
         block_b = bytearray(16)
         key_k1 = bytearray(16)
@@ -325,7 +348,7 @@ class AES:
         # return message integrity check array to calling method
         return mic
 
-    def _mic_generate_keys(self, key_1, key_2):
+    def _mic_generate_keys(self, key_1: bytearray16, key_2: bytearray16) -> None:
         # encrypt the 0's in k1 with network key
         self._aes_encrypt(key_1, self._network_key)
         # perform gen_key on key_1
@@ -346,7 +369,7 @@ class AES:
             key_2[15] ^= 0x87
 
     @staticmethod
-    def _shift_left(data):
+    def _shift_left(data: bytearray16) -> None:
         """Shifts data bytearray left by 1"""
         for byte_index in range(16):
             if byte_index < 15:
@@ -360,7 +383,7 @@ class AES:
             data[byte_index] = ((data[byte_index] << 1) + overflow) & 0xFF
 
     @staticmethod
-    def _xor_data(new_data, old_data):
+    def _xor_data(new_data: bytearray16, old_data: bytearray16) -> None:
         """XOR two data arrays
         :param bytearray new_data: Calculated data.
         :param bytearray old_data: data to be xor'd.

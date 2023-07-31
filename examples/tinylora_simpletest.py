@@ -2,10 +2,20 @@
 # SPDX-License-Identifier: MIT
 
 import time
+
+import board
 import busio
 import digitalio
-import board
+
 from adafruit_tinylora.adafruit_tinylora import TTN, TinyLoRa
+
+try:  # typing
+    from typing import Annotated, TypeAlias
+
+    bytearray4: TypeAlias = Annotated[bytearray, 4]
+    bytearray16: TypeAlias = Annotated[bytearray, 16]
+except ImportError:
+    pass
 
 # Board LED
 led = digitalio.DigitalInOut(board.D13)
@@ -24,10 +34,10 @@ rst = digitalio.DigitalInOut(board.D4)
 # rst = digitalio.DigitalInOut(board.RFM9X_RST)
 
 # TTN Device Address, 4 Bytes, MSB
-devaddr = bytearray([0x00, 0x00, 0x00, 0x00])
+devaddr: bytearray4 = bytearray([0x00, 0x00, 0x00, 0x00])
 
 # TTN Network Key, 16 Bytes, MSB
-nwkey = bytearray(
+nwkey: bytearray16 = bytearray(
     [
         0x00,
         0x00,
@@ -49,7 +59,7 @@ nwkey = bytearray(
 )
 
 # TTN Application Key, 16 Bytess, MSB
-app = bytearray(
+app: bytearray16 = bytearray(
     [
         0x00,
         0x00,
@@ -75,7 +85,7 @@ ttn_config = TTN(devaddr, nwkey, app, country="US")
 lora = TinyLoRa(spi, cs, irq, rst, ttn_config)
 
 while True:
-    data = bytearray(b"\x43\x57\x54\x46")
+    data: bytearray4 = bytearray(b"\x43\x57\x54\x46")
     print("Sending packet...")
     lora.send_data(data, len(data), lora.frame_counter)
     print("Packet sent!")
