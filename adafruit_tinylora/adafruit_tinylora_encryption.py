@@ -14,6 +14,7 @@ Message Integrity checks.
 try:  # typing
     from typing import Annotated, List, Tuple, TypeAlias
 
+    # pylint: disable=invalid-name
     bytearray2: TypeAlias = Annotated[bytearray, 2]
     bytearray4: TypeAlias = Annotated[bytearray, 4]
     bytearray16: TypeAlias = Annotated[bytearray, 16]
