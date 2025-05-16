@@ -8,6 +8,7 @@
 The Things Network Frequency Plans - AU915
 * Author(s): Brent Rubell
 """
+
 TTN_FREQS = {
     0: (0xE5, 0x33, 0x5A),  # 916.8 MHz
     1: (0xE5, 0x40, 0x26),  # 917.0 MHz

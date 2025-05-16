@@ -39,8 +39,11 @@ try:  # typing
 
     import busio
     import digitalio
-    from typing_extensions import Self  # Python <3.11
-    from typing_extensions import Annotated, TypeAlias
+    from typing_extensions import (
+        Annotated,
+        Self,  # Python <3.11
+        TypeAlias,
+    )
 
     # type aliases
     bytearray2: TypeAlias = Annotated[bytearray, 2]
@@ -130,14 +133,12 @@ class TTN:
         return self.net_key
 
 
-# pylint: disable=too-many-instance-attributes
 class TinyLoRa:
     """TinyLoRa Interface"""
 
     # SPI Write Buffer
     _BUFFER: bytearray2 = bytearray(2)
 
-    # pylint: disable=too-many-arguments,invalid-name
     def __init__(
         self,
         spi: busio.SPI,
@@ -185,7 +186,6 @@ class TinyLoRa:
         self._modemcfg: Optional[registeraddress] = None
         self.set_datarate("SF7BW125")
         # Set regional frequency plan
-        # pylint: disable=import-outside-toplevel
         if "US" in ttn_config.country:
             from adafruit_tinylora.ttn_usa import TTN_FREQS
 
@@ -308,9 +308,7 @@ class TinyLoRa:
         lora_pkt_len += 4
         self.send_packet(lora_pkt, lora_pkt_len, timeout)
 
-    def send_packet(
-        self, lora_packet: bytearray, packet_length: int, timeout: int
-    ) -> None:
+    def send_packet(self, lora_packet: bytearray, packet_length: int, timeout: int) -> None:
         """Sends a LoRa packet using the RFM Module
         :param bytearray lora_packet: assembled LoRa packet from send_data
         :param int packet_length: length of LoRa packet to send
@@ -396,7 +394,6 @@ class TinyLoRa:
         with self._device as device:
             # Strip out top bit to set 0 value (read).
             self._BUFFER[0] = address & 0x7F
-            # pylint: disable=no-member
             device.write(self._BUFFER, end=1)
             device.readinto(buf, end=length)
 
@@ -415,5 +412,4 @@ class TinyLoRa:
         with self._device as device:
             self._BUFFER[0] = address | 0x80  # MSB 1 to Write
             self._BUFFER[1] = val
-            # pylint: disable=no-member
             device.write(self._BUFFER, end=2)

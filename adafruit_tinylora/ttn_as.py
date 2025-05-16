@@ -8,6 +8,7 @@
 AS920 The Things Network Frequency Plans
 * Author(s): Brent Rubell
 """
+
 TTN_FREQS = {
     0: (0xE6, 0xCC, 0xF4),  # 868.1 MHz
     1: (0xE6, 0xD9, 0xC0),  # 868.3 MHz

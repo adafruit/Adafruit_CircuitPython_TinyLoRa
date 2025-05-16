@@ -9,6 +9,7 @@
 The Things Network Frequency Plans - CN470
 * Author(s): IAMLIUBO
 """
+
 TTN_FREQS = {
     0: (0x79, 0x93, 0x33),  # 486.3 MHz
     1: (0x79, 0xA0, 0x00),  # 486.5 MHz

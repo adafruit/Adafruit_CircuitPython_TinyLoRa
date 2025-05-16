@@ -8,6 +8,7 @@
 The Things Network Frequency Plans - US902
 * Author(s): Brent Rubell
 """
+
 TTN_FREQS = {
     0: (0xE1, 0xF9, 0xC0),  # 903.9 MHz
     1: (0xE2, 0x06, 0x8C),  # 904.1 MHz
