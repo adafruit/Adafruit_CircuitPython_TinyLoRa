@@ -8,6 +8,7 @@
 The Things Network Frequency Plans - EU863
 * Author(s): Brent Rubell
 """
+
 TTN_FREQS = {
     0: (0xD9, 0x06, 0x8B),  # 868.1 MHz
     1: (0xD9, 0x13, 0x58),  # 868.3 MHz

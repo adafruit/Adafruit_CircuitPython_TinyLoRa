@@ -14,7 +14,6 @@ Message Integrity checks.
 try:  # typing
     from typing import Annotated, List, Tuple, TypeAlias
 
-    # pylint: disable=invalid-name
     bytearray2: TypeAlias = Annotated[bytearray, 2]
     bytearray4: TypeAlias = Annotated[bytearray, 4]
     bytearray16: TypeAlias = Annotated[bytearray, 16]
@@ -155,9 +154,7 @@ class AES:
             for col in range(4):
                 data[col + (row << 2)] = state[row][col]
 
-    def _round_encrypt(
-        self, state: StateMatrix, key: bytearray, num_round: int
-    ) -> None:
+    def _round_encrypt(self, state: StateMatrix, key: bytearray, num_round: int) -> None:
         """Performs one round of AES.
         :param bytearray state: State array.
         :param bytearray key: Round key array.
