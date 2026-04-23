@@ -98,8 +98,8 @@ data: bytearray4 = bytearray(4)
 while True:
     temp_val = sensor.temperature
     humid_val = sensor.relative_humidity
-    print("Temperature: %0.2f C" % temp_val)
-    print("relative humidity: %0.1f %%" % humid_val)
+    print(f"Temperature: {temp_val:0.2f} C")
+    print(f"relative humidity: {humid_val:0.1f} %")
 
     # Encode float as int
     temp_val = int(temp_val * 100)
